@@ -13,7 +13,7 @@ def ExtractImages(inputvideo, outputdir, extension, frameperiod):
     while(cap.grab()):
         ret, frame = cap.retrieve()
         if(ret and (count % frameperiod) == 0):
-            filename = outputdir + "/" + str(count) + "." + extension
+            filename = outputdir + os.pathsep + str(count) + "." + extension
             if(os.path.exists(filename)):
                 os.remove(filename)
             cv2.imwrite(filename, frame)
