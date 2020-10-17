@@ -19,6 +19,9 @@ parser.add_argument('--sourcepath',type = str, default = 'dataset/', help ='Path
 parser.add_argument('--dest_path',type=str, required=True, default='Annotation/',help='Path of Dest XML files')
 args = parser.parse_args()
 
+#src_path = Path( "../data/Dataset/train/Office supplies/")
+#dst_path = Path( "../data/Dataset/train/Office supplies/")
+
 ids = []
 for file in os.listdir(args.sourcepath): #Save all images in a list
     filename = os.fsdecode(file)
@@ -61,35 +64,64 @@ for fname in ids:
             child_depth.text = '3'
         child_seg = SubElement(top, 'segmented')
         child_seg.text = '0'
-        for x in f:     #Iterate for each object in a image. 
+        for x in f:
+            print(x)     #Iterate for each object in a image. 
             x = list(x.split())
             child_obj = SubElement(top, 'object')
 
             child_name = SubElement(child_obj, 'name')
-            child_name.text = x[0] #name
+            if type(x[1]) == str:    
+                name = x[0] + x[1]
+                child_name.text = name
+                child_pose = SubElement(child_obj, 'pose')
+                child_pose.text = 'Unspecified'
 
-            child_pose = SubElement(child_obj, 'pose')
-            child_pose.text = 'Unspecified'
+                child_trun = SubElement(child_obj, 'truncated')
+                child_trun.text = '0'
 
-            child_trun = SubElement(child_obj, 'truncated')
-            child_trun.text = '0'
+                child_diff = SubElement(child_obj, 'difficult')
+                child_diff.text = '0'
 
-            child_diff = SubElement(child_obj, 'difficult')
-            child_diff.text = '0'
+                child_bndbox = SubElement(child_obj, 'bndbox')
 
-            child_bndbox = SubElement(child_obj, 'bndbox')
+                child_xmin = SubElement(child_bndbox, 'xmin')
+                print(x[1])
+                child_xmin.text = str(int(float(x[2]))) #xmin
 
-            child_xmin = SubElement(child_bndbox, 'xmin')
-            child_xmin.text = str(int(float(x[1]))) #xmin
+                child_ymin = SubElement(child_bndbox, 'ymin')
+                child_ymin.text = str(int(float(x[3]))) #ymin
 
-            child_ymin = SubElement(child_bndbox, 'ymin')
-            child_ymin.text = str(int(float(x[2]))) #ymin
+                child_xmax = SubElement(child_bndbox, 'xmax')
+                child_xmax.text = str(int(float(x[4]))) #xmax
 
-            child_xmax = SubElement(child_bndbox, 'xmax')
-            child_xmax.text = str(int(float(x[3]))) #xmax
+                child_ymax = SubElement(child_bndbox, 'ymax')
+                child_ymax.text = str(int(float(x[5]))) #ymax
+            else:
+                child_name.text = x[0] #name
 
-            child_ymax = SubElement(child_bndbox, 'ymax')
-            child_ymax.text = str(int(float(x[4]))) #ymax
+                child_pose = SubElement(child_obj, 'pose')
+                child_pose.text = 'Unspecified'
+
+                child_trun = SubElement(child_obj, 'truncated')
+                child_trun.text = '0'
+
+                child_diff = SubElement(child_obj, 'difficult')
+                child_diff.text = '0'
+
+                child_bndbox = SubElement(child_obj, 'bndbox')
+
+                child_xmin = SubElement(child_bndbox, 'xmin')
+                print(x[1])
+                child_xmin.text = str(int(float(x[1]))) #xmin
+
+                child_ymin = SubElement(child_bndbox, 'ymin')
+                child_ymin.text = str(int(float(x[2]))) #ymin
+
+                child_xmax = SubElement(child_bndbox, 'xmax')
+                child_xmax.text = str(int(float(x[3]))) #xmax
+
+                child_ymax = SubElement(child_bndbox, 'ymax')
+                child_ymax.text = str(int(float(x[4]))) #ymax
 
         tree = ET.ElementTree(top)
         save = fname+'.xml'

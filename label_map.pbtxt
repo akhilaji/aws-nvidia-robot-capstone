@@ -1,0 +1,72 @@
+item {
+    id: 1
+    name: 'Bottle'
+}
+item {
+    id: 2
+    name: 'Chair'
+}
+item {
+    id: 3
+    name: 'Computer keyboard'
+}
+item {
+    id: 4
+    name: 'Computer monitor'
+}
+item {
+    id: 5
+    name: 'Computer mouse'
+}
+item {
+    id: 6
+    name: 'Corded phone'
+}
+item {
+    id: 7
+    name: 'Desk'
+}
+item {
+    id: 8
+    name: 'Headphones'
+}
+item {
+    id: 9
+    name: 'Microphone'
+}
+item {
+    id: 10
+    name: 'Mobile phone'
+}
+item {
+    id: 11
+    name: 'Mug'
+}
+item {
+    id: 12
+    name: 'Office building'
+}
+item {
+    id: 13
+    name: 'Office supplies'
+}
+item {
+    id: 14
+    name: 'Table'
+}
+item {
+    id: 15
+    name: 'Tablet computer'
+}
+item {
+    id: 16
+    name: 'Telephone'
+}
+item {
+    id: 17
+    name: 'Television'
+}
+item {
+    id: 18
+    name: 'Whiteboard'
+}
