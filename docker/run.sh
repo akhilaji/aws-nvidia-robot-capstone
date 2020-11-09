@@ -1,0 +1,1 @@
+sudo docker run --rm -it -v ${PWD}:/workspace/mount asu-aws-nvidia-robo:latest
