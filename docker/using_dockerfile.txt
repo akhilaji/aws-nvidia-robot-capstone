@@ -1,2 +1,0 @@
-get docker
-sudo apt-get install -y nvidia-container-toolkit //for gpu support

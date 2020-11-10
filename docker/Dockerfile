@@ -38,7 +38,9 @@ RUN pip3 install \
         opencv-python
 
 # creates workspace directory to act as a root for this project
-RUN mkdir workspace && mkdir workspace/git
+RUN mkdir workspace && cd workspace && \
+        mkdir git && \
+        mkdir models
 
 #install cmake
 RUN cd workspace/git && \
@@ -62,8 +64,10 @@ RUN cd workspace/git/darknet && \
 
 # install MiDaS
 RUN git clone https://github.com/intel-isl/MiDaS.git workspace/git/MiDaS && \
-        cd /workspace/git/MiDaS && \
-        wget https://github.com/intel-isl/MiDaS/releases/download/v2/model-f46da743.pt
+        wget https://github.com/intel-isl/MiDaS/releases/download/v2/model-f46da743.pt workspace/models/intel-isl_MiDaS_v2_model-f46da743.pt
 
 # install project repository
-#RUN git clone https://github.com/akhilaji/aws-nvidia-robot-capstone workspace/git/aws-nvidia-robot
+RUN git clone https://github.com/akhilaji/aws-nvidia-robot-capstone workspace/git/aws-nvidia-robot
+
+# setup envrionment variables
+ENV MiDaS='python3 /workspace/git/aws-nvidia-robot-capstone/scripts/midas_wrapper.py'
