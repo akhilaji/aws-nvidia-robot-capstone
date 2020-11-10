@@ -7,7 +7,7 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('-i', '--input',
         default=os.path.join(repo_path, 'input'),
-        help='path to a folder of images, or a single image')
+        help='path to a folder of images')
     arg_parser.add_argument('-o', '--output',
         default=os.path.join(repo_path, 'output'),
         help='path to output folder')
@@ -18,6 +18,8 @@ if __name__ == "__main__":
     try:
         sys.path.append(repo_path)
         from run import run
+        if(not os.path.exists(namespace.output)):
+            os.makedirs(namespace.output)
         run(namespace.input, namespace.output, namespace.model)
     except ImportError as ie:
         print(ie)

@@ -64,10 +64,12 @@ RUN cd workspace/git/darknet && \
 
 # install MiDaS
 RUN git clone https://github.com/intel-isl/MiDaS.git workspace/git/MiDaS && \
-        wget https://github.com/intel-isl/MiDaS/releases/download/v2/model-f46da743.pt workspace/models/intel-isl_MiDaS_v2_model-f46da743.pt
+        cd workspace/models && \
+        wget https://github.com/intel-isl/MiDaS/releases/download/v2/model-f46da743.pt  && \
+        mv model-f46da743.pt intel-isl_MiDaS_v2_model-f46da743.pt
 
 # install project repository
 RUN git clone https://github.com/akhilaji/aws-nvidia-robot-capstone workspace/git/aws-nvidia-robot
 
 # setup envrionment variables
-ENV MiDaS='python3 /workspace/git/aws-nvidia-robot-capstone/scripts/midas_wrapper.py'
+RUN echo 'alias MiDaS="python3 /workspace/git/aws-nvidia-robot-capstone/scripts/midas_wrapper.py"' >> ~/.bashrc
