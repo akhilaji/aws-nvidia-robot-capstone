@@ -73,3 +73,4 @@ RUN git clone https://github.com/akhilaji/aws-nvidia-robot-capstone workspace/gi
 
 # setup envrionment variables
 RUN echo 'alias MiDaS="python3 /workspace/git/aws-nvidia-robot-capstone/scripts/midas_wrapper.py"' >> ~/.bashrc
+RUN echo 'alias split="python3 /workspace/git/aws-nvidia-robot-capstone/scripts/split.py"' >> ~/.bashrc
