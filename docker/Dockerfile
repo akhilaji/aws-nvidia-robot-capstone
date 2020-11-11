@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
         libopencv-dev \
         pkg-config \
         wget \
+        unzip \
         git
 
 # install python
@@ -67,10 +68,20 @@ RUN git clone https://github.com/intel-isl/MiDaS.git workspace/git/MiDaS && \
         cd workspace/models && \
         wget https://github.com/intel-isl/MiDaS/releases/download/v2/model-f46da743.pt  && \
         mv model-f46da743.pt intel-isl_MiDaS_v2_model-f46da743.pt
+RUN cd root/.cache && \
+        wget https://github.com/facebookresearch/WSL-Images/archive/master.zip && \
+        unzip master.zip && rm master.zip && \
+        mkdir hub && cd hub && \
+        mkdir checkpoints && cd checkpoints && \
+        wget https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth
+
+#Downloading: "https://github.com/facebookresearch/WSL-Images/archive/master.zip" to /root/.cache/torch/hub/master.zip
+#Downloading: "https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth" to /root/.cache/torch/hub/checkpoints/ig_resnext101_32x8-c38310e5.pth
 
 # install project repository
-RUN git clone https://github.com/akhilaji/aws-nvidia-robot-capstone workspace/git/aws-nvidia-robot
+RUN git clone https://github.com/akhilaji/aws-nvidia-robot-capstone workspace/git/aws-nvidia-robot-capstone
 
 # setup envrionment variables
 RUN echo 'alias MiDaS="python3 /workspace/git/aws-nvidia-robot-capstone/scripts/midas_wrapper.py"' >> ~/.bashrc
 RUN echo 'alias split="python3 /workspace/git/aws-nvidia-robot-capstone/scripts/split.py"' >> ~/.bashrc
+RUN echo 'alias encode="python3 /workspace/git/aws-nvidia-robot-capstone/scripts/encode.py"' >> ~/.bashrc
