@@ -4,6 +4,7 @@ import os
 import sys
 import cv2
 import numpy as np
+import re
 import PIL
 from PIL import Image
 from PIL import ImageColor
@@ -102,7 +103,7 @@ def draw_boxes(image, boxes, class_names, scores, max_boxes=10, min_score=0.1):
     for i in range(min(boxes.shape[0], max_boxes)):
         if scores[i] >= min_score:
             ymin, xmin, ymax, xmax = tuple(boxes[i])
-            display_str = "{}: {}%".format(class_names[i].decode("ascii"),
+            display_str = "{}: {}%".format(class_names[i],
                                             int(100 * scores[i]))
             color = colors[hash(class_names[i]) % len(colors)]
             image_pil = Image.fromarray(np.uint8(image)).convert("RGB")
@@ -128,6 +129,73 @@ def SplitCapture(cap, output, file_format, upper, period):
         SetFrameNumber(cap, i + period)
         i += period
 
+def DrawBoundingBox(filename, video, output):
+    bbox_data = open(filename, 'r')
+    frame = -1
+
+    objects = []
+    line = bbox_data.readline()
+    line.rstrip()
+
+    while line:
+        # build a tuple from the line with attributes
+        regex = re.compile("[^, \n]+")
+        obj = re.findall(regex, line)
+        
+        # convert data to floats
+        for i in range(0, len(obj)):
+            obj[i] = float(obj[i])
+
+        # check if the object is on the active frame
+        if int(obj[0]) == frame:
+            # the current object is on the same frame, so
+            # we want to add it to our current list of objects in frame
+
+            objects.append(obj)
+        else:
+            # the current object is not on the frame, so
+            # we want to draw all the boxes for the current frame
+
+            # get the current frame corresponding to these objects
+            cap = cv2.VideoCapture(video)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, int((frame - 1)))
+            res, image = cap.read()
+            
+            if res:
+                # build the data to draw the objects on the image
+                boxes     = np.empty((len(objects), 4))
+                names     = []
+                scores    = []
+                obj_count = len(objects)
+                thresh    = 0.1
+                i = 0
+
+                for curr in objects:
+                    bbox = np.array([curr[4], curr[3], curr[6], curr[5]])
+                    boxes[i] = bbox
+
+                    names.append(classes[int(curr[1])])
+                    scores.append(curr[2])
+
+                    i = i + 1
+
+                # draw the bounding boxes
+                result = draw_boxes(image, boxes, names, scores, obj_count, thresh)
+
+                # write the frame
+                cv2.imwrite(os.path.join(output, str(frame) + '.' + 'jpg'), result)
+
+            # set the new frame number
+            frame = int(obj[0])
+
+            # clear the tuple and add new object
+            objects.clear()
+            objects.append(obj)
+
+        # read a new line
+        line = bbox_data.readline()
+        line.rstrip()
+
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('-i', '--input',  type = str, default = None,  help = 'path of video to split')
@@ -137,11 +205,15 @@ if __name__ == "__main__":
     arg_parser.add_argument('-f', '--format', type = str, default = 'jpg', help = 'the file format to save extracted frames as')
     arg_parser.add_argument('-u', '--upper',  default = float('inf'),      help = 'upper bound on frame number extraction')
     arg_parser.add_argument('-t', '--text',   type = str, default = None,  help = 'input text file of bbox data (<frame>, <class_id>, <conf>, <x_min>, <y_min>, <x_max>, <y_max>)')
-    #ns = namespace
+    
+    # ns = namespace
     ns, args = arg_parser.parse_known_args(sys.argv)
-    cap = cv2.VideoCapture(ns.input)
+    # cap = cv2.VideoCapture(ns.input)
     if(not os.path.exists(ns.output)):
         os.makedirs(ns.output)
-    SetFrameNumber(cap, ns.lower)
-    SplitCapture(cap, ns.output, ns.format, ns.upper, ns.period)
-    cap.release()
+    # SetFrameNumber(cap, ns.lower)
+    # SplitCapture(cap, ns.output, ns.format, ns.upper, ns.period)
+    # cap.release()
+
+    if ns.text and ns.input and ns.output:
+        DrawBoundingBox(ns.text, ns.input, ns.output)
