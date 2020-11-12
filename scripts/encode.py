@@ -1,7 +1,7 @@
 import argparse
 import os
 import sys
-from cv2 import cv2
+import cv2
 
 if(__name__ == "__main__"):
     arg_parser = argparse.ArgumentParser()
@@ -14,6 +14,8 @@ if(__name__ == "__main__"):
 
     ns, args = arg_parser.parse_known_args(sys.argv)
     frames = sorted(os.listdir(ns.input))
+    if(not len(frames)):
+        print("Error: Directory '" + ns.input + "' is empty.")
     fourcc = cv2.VideoWriter_fourcc(*ns.codec)
     if(ns.width == None or ns.height == None):
         img = cv2.imread(os.path.join(ns.input, frames[0]))
@@ -24,6 +26,7 @@ if(__name__ == "__main__"):
     encoder = cv2.VideoWriter(ns.output, fourcc, ns.fps, (ns.width, ns.height))
     for frame in frames:
         path = os.path.join(ns.input, frame)
+        print(path)
         read = cv2.imread(path)
         encoder.write(read)
     encoder.release()
