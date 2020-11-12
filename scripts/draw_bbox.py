@@ -10,7 +10,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageOps
 
-
+classes = ["Bottle", "Chair", "Computer keyboard", "Computer monitor", "Computer mouse", "Corded phone", "Desk", "Headphones", "Laptop", "Microphone", "Mobile phone", "Mug", "Office building", "Office supplies", "Pen", "Person", "Stapler", "Table", "Tablet computer", "Telephone", "Whiteboard"]
 
 def SetFrameNumber(cap, frame_number):
     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
