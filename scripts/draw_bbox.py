@@ -4,6 +4,7 @@ import os
 import sys
 import cv2
 import numpy as np
+import PIL
 from PIL import Image
 from PIL import ImageColor
 from PIL import ImageDraw
@@ -100,21 +101,21 @@ def draw_boxes(image, boxes, class_names, scores, max_boxes=10, min_score=0.1):
 
     for i in range(min(boxes.shape[0], max_boxes)):
         if scores[i] >= min_score:
-        ymin, xmin, ymax, xmax = tuple(boxes[i])
-        display_str = "{}: {}%".format(class_names[i].decode("ascii"),
-                                        int(100 * scores[i]))
-        color = colors[hash(class_names[i]) % len(colors)]
-        image_pil = Image.fromarray(np.uint8(image)).convert("RGB")
-        draw_bounding_box_on_image(
-            image_pil,
-            ymin,
-            xmin,
-            ymax,
-            xmax,
-            color,
-            font,
-            display_str_list=[display_str])
-        np.copyto(image, np.array(image_pil))
+            ymin, xmin, ymax, xmax = tuple(boxes[i])
+            display_str = "{}: {}%".format(class_names[i].decode("ascii"),
+                                            int(100 * scores[i]))
+            color = colors[hash(class_names[i]) % len(colors)]
+            image_pil = Image.fromarray(np.uint8(image)).convert("RGB")
+            draw_bounding_box_on_image(
+                image_pil,
+                ymin,
+                xmin,
+                ymax,
+                xmax,
+                color,
+                font,
+                display_str_list=[display_str])
+            np.copyto(image, np.array(image_pil))
     return image
 
 def SplitCapture(cap, output, file_format, upper, period):
@@ -135,8 +136,8 @@ if __name__ == "__main__":
     arg_parser.add_argument('-p', '--period', type = int, default = 1,     help = 'extracts a frame after every period steps')
     arg_parser.add_argument('-f', '--format', type = str, default = 'jpg', help = 'the file format to save extracted frames as')
     arg_parser.add_argument('-u', '--upper',  default = float('inf'),      help = 'upper bound on frame number extraction')
-    arg_parser.add_argument('-t', '--text',   type = str, default = None,  help = 'input text file of bbox data (<frame>, <class_id>, <conf>, <x_min>, <y_min>, <x_max>, <y_max>)'
-
+    arg_parser.add_argument('-t', '--text',   type = str, default = None,  help = 'input text file of bbox data (<frame>, <class_id>, <conf>, <x_min>, <y_min>, <x_max>, <y_max>)')
+    #ns = namespace
     ns, args = arg_parser.parse_known_args(sys.argv)
     cap = cv2.VideoCapture(ns.input)
     if(not os.path.exists(ns.output)):
