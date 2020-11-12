@@ -135,6 +135,7 @@ if __name__ == "__main__":
     arg_parser.add_argument('-p', '--period', type = int, default = 1,     help = 'extracts a frame after every period steps')
     arg_parser.add_argument('-f', '--format', type = str, default = 'jpg', help = 'the file format to save extracted frames as')
     arg_parser.add_argument('-u', '--upper',  default = float('inf'),      help = 'upper bound on frame number extraction')
+    arg_parser.add_argument('-t', '--text',   type = str, default = None,  help = 'input text file of bbox data (<frame>, <class_id>, <conf>, <x_min>, <y_min>, <x_max>, <y_max>)'
 
     ns, args = arg_parser.parse_known_args(sys.argv)
     cap = cv2.VideoCapture(ns.input)
