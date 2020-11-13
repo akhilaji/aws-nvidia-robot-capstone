@@ -15,7 +15,7 @@ This will install requirements in a virtualenv.
 
 https://www.tensorflow.org/install/gpu
 
-**Darknet Setup**
+**Darknet Setup**  
 Make sure compatible versions of CUDA and CUDNN are installed on your system 
 `git clone https://github.com/AlexeyAB/darknet`
 
@@ -29,3 +29,26 @@ cd into the downloaded darknet repo and modify the makefile to enable openCV, CU
 Make Darknet with command:
 `make`
 
+The Custom YoloV4 Model can detect objects from the following classes:  
+Bottle
+Chair
+Computer keyboard
+Computer monitor
+Computer mouse
+Corded phone
+Desk
+Headphones
+Laptop
+Microphone
+Mobile phone
+Mug
+Office building
+Office supplies
+Pen
+Person
+Stapler
+Table
+Tablet computer
+Telephone
+Television
+Whiteboard
