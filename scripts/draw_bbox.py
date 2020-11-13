@@ -126,9 +126,6 @@ def draw_boxes(image, boxes, class_names, scores, max_boxes=10):
     return image
 
 
-t
-
-
 def SplitCapture(cap, output, file_format, period):
     # cap:
     # output:
@@ -141,45 +138,23 @@ def SplitCapture(cap, output, file_format, period):
     while(i < upper and cap.grab()):
         res, frame = cap.read()
         if(res):
-            cv2.imwrite(os.path.join(output, fmt %
-                                     int(i) + '.' + file_format), frame)
+            cv2.imwrite(os.path.join(output, fmt % int(i) + '.' + file_format), frame)
         SetFrameNumber(cap, i + period)
         i += period
 
-
-def SaveFrame(video):
-    cap = cv2.VideoCapture(video)
-
-    # Define the codec and create VideoWriter object
-    #fourcc = cv2.cv.CV_FOURCC(*'DIVX')
-    #out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
-    out = cv2.VideoWriter('output.avi', -1, 20.0, (640, 480))
-
-    frame_num = 0
-    while(cap.isOpened()):
-        ret, frame = cap.read()
-        if ret == True:
-            if(frame_num in edited_frames):
-                frame = edited_frames[frame_num]
-            # write the frame
-            out.write(frame)
-
-            cv2.imshow('frame', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            break
-        frame_num += 1
-
-    # Release everything if job is finished
-    cap.release()
-    out.release()
-    cv2.destroyAllWindows()
-
-
 def DrawBoundingBox(filename, video, output):
     bbox_data = open(filename, 'r')
-    frame = -1
+
+    cap_in  = cv2.VideoCapture(video)
+
+    print('WIDTH: '  + str(cap_in.get(cv2.CAP_PROP_FRAME_WIDTH)))
+    print('HEIGHT: ' + str(cap_in.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    print('FPS: '    + str(cap_in.get(cv2.CAP_PROP_FPS)))
+
+    cap_out = cv2.VideoWriter(output, cv2.VideoWriter_fourcc(*'XVID'), 30.0, (1920, 1080))
+
+    frame = 1
+    curr_frame = 1
 
     objects = []
     line = bbox_data.readline()
@@ -205,27 +180,22 @@ def DrawBoundingBox(filename, video, output):
             # we want to draw all the boxes for the current frame
 
             # get the current frame corresponding to these objects
-            cap = cv2.VideoCapture(video)
-            cap.set(cv2.CAP_PROP_POS_FRAMES, int((frame - 1)))
-            res, image = cap.read()
+            cap_in.set(cv2.CAP_PROP_POS_FRAMES, int((frame - 1)))
+            res, image = cap_in.read()
 
             if res:
                 # build the data to draw the objects on the image
-                boxes = np.empty((len(objects), 4))
-                names = []
+                boxes  = np.empty((len(objects), 4))
+                names  = []
                 scores = []
                 obj_count = len(objects)
                 i = 0
 
                 for curr in objects:
-                    x_min = curr[3] - (curr[5] - curr[3]) / \
-                        2.0  # bbox.x - bbox.width / 2.0
-                    # bbox.y - bbox.height / 2.0
-                    y_min = curr[4] - (curr[6] - curr[4]) / 2.0
-                    x_max = curr[3] + (curr[5] - curr[3]) / \
-                        2.0  # bbox.x + bbox.width / 2.0
-                    # bbox.y + bbox.height / 2.0
-                    y_max = curr[4] + (curr[6] - curr[4]) / 2.0
+                    x_min = curr[3] - (curr[5] - curr[3]) / 2.0 # bbox.x - bbox.width  / 2.0
+                    y_min = curr[4] - (curr[6] - curr[4]) / 2.0 # bbox.y - bbox.height / 2.0
+                    x_max = curr[3] + (curr[5] - curr[3]) / 2.0 # bbox.x + bbox.width  / 2.0
+                    y_max = curr[4] + (curr[6] - curr[4]) / 2.0 # bbox.y + bbox.height / 2.0
 
                     bbox = np.array([y_min, x_min, y_max, x_max])
                     boxes[i] = bbox
@@ -236,13 +206,24 @@ def DrawBoundingBox(filename, video, output):
                     i = i + 1
 
                 # draw the bounding boxes
-                edited_frame_nums.append(frame)
                 result = draw_boxes(image, boxes, names, scores, obj_count)
-                edited_frames[frame] = result
 
-                # write the frame
-                cv2.imwrite(os.path.join(
-                    output, str(frame) + '.' + 'jpg'), result)
+                # write the frames to an output video
+                cap_in.set(cv2.CAP_PROP_POS_FRAMES, int(curr_frame))
+                while curr_frame != frame:
+                    ret, tmp_frame = cap_in.read()
+
+                    if ret:
+                        cap_out.write(tmp_frame)
+                    else:
+                        break
+
+                    curr_frame += 1
+
+                cap_out.write(result)
+                curr_frame += 1
+
+                # cv2.imwrite(os.path.join(output, str(frame) + '.' + 'jpg'), result)
 
             # set the new frame number
             frame = int(obj[0])
@@ -254,7 +235,9 @@ def DrawBoundingBox(filename, video, output):
         # read a new line
         line = bbox_data.readline()
         line.rstrip()
-    SaveFrame(video)
+
+    cap_in.release()
+    cap_out.release()
 
 
 if __name__ == "__main__":
@@ -277,8 +260,8 @@ if __name__ == "__main__":
     # ns = namespace
     ns, args = arg_parser.parse_known_args(sys.argv)
     # cap = cv2.VideoCapture(ns.input)
-    if(not os.path.exists(ns.output)):
-        os.makedirs(ns.output)
+    # if(not os.path.exists(ns.output)):
+        # os.makedirs(ns.output)
     # SetFrameNumber(cap, ns.lower)
     # SplitCapture(cap, ns.output, ns.format, ns.upper, ns.period)
     # cap.release()
