@@ -218,10 +218,11 @@ def DrawBoundingBox(filename, video, output):
                 i = 0
 
                 for curr in objects:
-                    x_min = curr[3] - (curr[5] - curr[3]) / 2.0
-                    y_min = curr[4] - (curr[6] - curr[4]) / 2.0
-                    x_max = curr[3] + (curr[5] - curr[3]) / 2.0
-                    y_max = curr[4] + (curr[6] - curr[4]) / 2.0
+                    x_min = curr[3] - (curr[5] - curr[3]) / 2.0 # bbox.x - bbox.width / 2.0
+                    y_min = curr[4] - (curr[6] - curr[4]) / 2.0 # bbox.y - bbox.height / 2.0
+                    x_max = curr[3] + (curr[5] - curr[3]) / 2.0 # bbox.x + bbox.width / 2.0
+                    y_max = curr[4] + (curr[6] - curr[4]) / 2.0 # bbox.y + bbox.height / 2.0
+
                     bbox = np.array([y_min, x_min, y_max, x_max])
                     boxes[i] = bbox
 
