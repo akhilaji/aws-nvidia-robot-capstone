@@ -15,6 +15,7 @@ from PIL import ImageOps
 classes = ["Bottle", "Chair", "Computer keyboard", "Computer monitor", "Computer mouse", "Corded phone", "Desk", "Headphones", "Laptop", "Microphone",
            "Mobile phone", "Mug", "Office building", "Office supplies", "Pen", "Person", "Stapler", "Table", "Tablet computer", "Telephone", "Whiteboard"]
 edited_frame_nums = []
+edited_frames = {}
 
 
 def SetFrameNumber(cap, frame_number):
@@ -146,7 +147,7 @@ def SplitCapture(cap, output, file_format, period):
         i += period
 
 
-def SaveFrame(video, frame):
+def SaveFrame(video):
     cap = cv2.VideoCapture(video)
 
     # Define the codec and create VideoWriter object
@@ -158,9 +159,8 @@ def SaveFrame(video, frame):
     while(cap.isOpened()):
         ret, frame = cap.read()
         if ret == True:
-            if(frame in edited_frame_nums):
-                frame = edited_frame_nums[frame_num]
-
+            if(frame_num in edited_frames):
+                frame = edited_frames[frame_num]
             # write the frame
             out.write(frame)
 
@@ -218,10 +218,14 @@ def DrawBoundingBox(filename, video, output):
                 i = 0
 
                 for curr in objects:
-                    x_min = curr[3] - (curr[5] - curr[3]) / 2.0 # bbox.x - bbox.width / 2.0
-                    y_min = curr[4] - (curr[6] - curr[4]) / 2.0 # bbox.y - bbox.height / 2.0
-                    x_max = curr[3] + (curr[5] - curr[3]) / 2.0 # bbox.x + bbox.width / 2.0
-                    y_max = curr[4] + (curr[6] - curr[4]) / 2.0 # bbox.y + bbox.height / 2.0
+                    x_min = curr[3] - (curr[5] - curr[3]) / \
+                        2.0  # bbox.x - bbox.width / 2.0
+                    # bbox.y - bbox.height / 2.0
+                    y_min = curr[4] - (curr[6] - curr[4]) / 2.0
+                    x_max = curr[3] + (curr[5] - curr[3]) / \
+                        2.0  # bbox.x + bbox.width / 2.0
+                    # bbox.y + bbox.height / 2.0
+                    y_max = curr[4] + (curr[6] - curr[4]) / 2.0
 
                     bbox = np.array([y_min, x_min, y_max, x_max])
                     boxes[i] = bbox
@@ -234,6 +238,7 @@ def DrawBoundingBox(filename, video, output):
                 # draw the bounding boxes
                 edited_frame_nums.append(frame)
                 result = draw_boxes(image, boxes, names, scores, obj_count)
+                edited_frames[frame] = result
 
                 # write the frame
                 cv2.imwrite(os.path.join(
@@ -249,6 +254,7 @@ def DrawBoundingBox(filename, video, output):
         # read a new line
         line = bbox_data.readline()
         line.rstrip()
+    SaveFrame(video)
 
 
 if __name__ == "__main__":
