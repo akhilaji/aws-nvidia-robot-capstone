@@ -37,6 +37,7 @@ def define_image_masks(image, frame):
     img = cv2.imread(image)
     f = frame
 
+#TODO: Test implementation, add method call and pass a sample bbox to test roi works
 def region_of_interest(image, bbox):
     height = image.shape[0]
     polygons = np.array([[bbox.x_min, bbox.y_min, bbox.x_max, bbox.y_max]])
