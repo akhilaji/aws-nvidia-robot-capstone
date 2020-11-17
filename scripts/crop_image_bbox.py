@@ -37,6 +37,14 @@ def define_image_masks(image, frame):
     img = cv2.imread(image)
     f = frame
 
+def region_of_interest(image, bbox):
+    height = image.shape[0]
+    polygons = np.array([[bbox.x_min, bbox.y_min, bbox.x_max, bbox.y_max]])
+    mask = np.zeros_like(image)
+    cv2.fillPoly(mask, polygons, 255)
+    masked_image = cv2.bitwise_and(image, mask) #
+
+    return masked_image
         
 #this function calculates bounding box pixel values 
 def calculate_bboxes():
