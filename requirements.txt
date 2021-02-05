@@ -8,6 +8,7 @@ jupyterlab
 opencv-python == 4.4.0.44
 tqdm == 4.50.0
 scikit-image == 0.17.2
+networkx
 kafka-python
 Flask
 pathlib
