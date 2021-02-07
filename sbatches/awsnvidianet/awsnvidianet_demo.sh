@@ -34,4 +34,4 @@ sed -i -E "0,/subdivisions=/{s/subdivisions=([0-9]+)/subdivisions=1/}" awsnvidia
 
 # run darknet on example video
 cd $HOME/darknet/
-./darknet detector demo awsnvidianet/data/awsnvidia.data awsnvidianet/cfg/awsnvidia.cfg awsnvidianet/weights/awsnvidia.weights awsnvidianet/tests/asu-indoors-demo-1.mp4 -out_filename awsnvidianet/results/asu-indoors-demo-1-results.avi
+./darknet detector demo awsnvidianet/data/awsnvidia.data awsnvidianet/cfg/awsnvidia.cfg awsnvidianet/weights/awsnvidia.weights awsnvidianet/tests/asu-indoors-demo-1.mp4 -dont_show -out_filename awsnvidianet/results/asu-indoors-demo-1-results.avi
