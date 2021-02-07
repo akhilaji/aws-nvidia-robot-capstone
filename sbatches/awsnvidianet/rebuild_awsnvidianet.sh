@@ -9,8 +9,8 @@
 #SBATCH -p serial                        # partition type to use
 #SBATCH -q normal                        # quality-of-service (QoS)
 
-#SBATCH -o rebuild_darknet.out  # STDOUT
-#SBATCH -e rebuild_darknet.err  # STDERR
+#SBATCH -o rebuild_awsnvidianet.out  # STDOUT
+#SBATCH -e rebuild_awsnvidianet.err  # STDERR
 
 #SBATCH --mail-type=ALL                  # send email for start, stop, fail
 #SBATCH --mail-user=jwande18@asu.edu     # send emails to
