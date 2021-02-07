@@ -28,8 +28,8 @@ export CPATH="/packages/7x/cudnn/7.0/include/:$CPATH"
 export LD_LIBRARY_PATH="/packages/7x/opencv/3.4.1/lib64/:$LD_LIBRARY_PATH"
 
 # set batch and subdivisions to 1
-sed -i -E "0,/batch=/{s/batch=([0-9]+)/batch=1/}" cfg/Gaussian_yolov3_CSE485.cfg
-sed -i -E "0,/subdivisions=/{s/subdivisions=([0-9]+)/subdivisions=1/}" cfg/Gaussian_yolov3_CSE485.cfg
+sed -i -E "0,/batch=/{s/batch=([0-9]+)/batch=1/}" awsnvidianet/cfg/awsnvidia.cfg
+sed -i -E "0,/subdivisions=/{s/subdivisions=([0-9]+)/subdivisions=1/}" awsnvidianet/cfg/awsnvidia.cfg
 
 
 # run darknet on example video
