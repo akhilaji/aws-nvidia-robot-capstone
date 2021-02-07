@@ -11,8 +11,8 @@
 
 #SBATCH --gres=gpu:1                           # number of gpu's
 
-#SBATCH -o awsnvidianet_test.out  # STDOUT
-#SBATCH -e awsnvidianet_test.err  # STDERR
+#SBATCH -o awsnvidianet_demo.out  # STDOUT
+#SBATCH -e awsnvidianet_demo.err  # STDERR
 
 #purge existing modules
 module purge
