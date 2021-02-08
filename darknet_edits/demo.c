@@ -247,11 +247,17 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     float avg_fps = 0;
     int frame_counter = 0;
     int global_frame_counter = 0;
+
+    unsigned seed = (unsigned) time(NULL);
+    srand(seed);    
+
     FILE *results_output;
-    results_output = fopen("yolov4_object_detection_results.txt", "w");
-    
+    results_output = fopen("awsnvidianet_data.txt", "w");
+
+    fprintf(results_output, "%d\n", seed);    
+
     if(!results_output) {
-        fprintf(stderr, "Unable to open yolov4_object_detection_results.txt");
+        fprintf(stderr, "Error: Unable to open awsnvidianet_data.txt");
     }
 
     while(1){
