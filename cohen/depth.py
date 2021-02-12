@@ -32,6 +32,9 @@ Attributes:
 """
 
 import torch
+import numpy as np
+from nptyping import NDArray
+from typing import Any
 
 midas_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 midas_transforms = torch.hub.load('intel-isl/MiDaS', 'transforms')
@@ -46,15 +49,17 @@ midas_model_small = torch.hub.load('intel-isl/MiDaS', 'MiDaS_small')
 midas_model_small.to(midas_device)
 midas_model_small.eval()
 
-def midas(img, model, transforms):
+def midas(
+        rgb_img: NDArray[(Any, Any, 3), np.uint8],
+        model, transforms
+    ) -> NDArray[(Any, Any), np.float32]:
     """
     Gets a single frame estimated depth map by applying the provided image
     transforms and MiDaS model instance to an RGB image.
 
     Args:
-        img (numpy.array): The RGB image to apply the model to. The RGB image
-            should be a numpy.array as obtained by reading an image file with
-            cv2.imread(filename).
+        rgb_img (NDArray[(Any, Any, 3), np.uint8]): The RGB image to apply the
+            MiDaS model to.
         
         model (???): The model loaded using torch.hub.load. Preloaded into
             this module so should be either midas_model_large or
@@ -67,46 +72,50 @@ def midas(img, model, transforms):
             you want to use.
     
     Returns:
-        numpy.array: The depth map estimated by model as a numpy.array of
-            floats.
+        NDArray[(Any, Any), np.float32]: The inverse depth map estimated by the
+            MiDaS model for the input RGB image.
     """
-    input_batch = transforms(img).to(midas_device)
+    input_batch = transforms(rgb_img).to(midas_device)
     with torch.no_grad():
         prediction = model(input_batch)
         prediction = torch.nn.functional.interpolate(
             prediction.unsqueeze(1),
-            size=img.shape[:2],
+            size=rgb_img.shape[:2],
             mode="bicubic",
             align_corners=False,
         ).squeeze()
     return prediction.cpu().numpy()
 
-def midas_large(img):
+def midas_large(
+        rgb_img: NDArray[(Any, Any, 3), np.uint8]
+    ) -> NDArray[(Any, Any), np.float32]:
     """
-    Gets a single frame depth map estimation by applying the large version of
-    the MiDaS model to an RGB image.
+    Performs a single frame depth map estimation by feeding an RGB image to the
+    default MiDaS model and returns the result.
 
     Args:
-        img (numpy.array): An RGB image as obtained by reading an image with
-            cv2.imread(filename).
+        rgb_img (NDArray[(Any, Any, 3), np.uint8]): The RGB image to feed to
+            MiDaS.
 
     Returns:
-        numpy.array: The depth map estimated by MiDaS as a numpy.array of
-            floats.
+        NDArray[(Any, Any), np.float32]: The inverse depth map estimated by
+            MiDaS.
     """
-    return midas(img, midas_model_large, midas_transforms_large)
+    return midas(rgb_img, midas_model_large, midas_transforms_large)
 
-def midas_small(img):
+def midas_small(
+        rgb_img: NDArray[(Any, Any, 3), np.uint8]
+    ) -> NDArray[(Any, Any), np.float32]:
     """
-    Gets a single frame depth map estimation by applying the small version of
-    the MiDaS model to an RGB image.
+    Performs a single frame depth map estimation by feeding an RGB image to the
+    small MiDaS model and returns the result.
 
     Args:
-        img (numpy.array): An RGB image as obtained by reading an image with
-            cv2.imread(filename).
+        rgb_img (NDArray[(Any, Any, 3), np.uint8]): The RGB image to feed to
+            MiDaS.
 
     Returns:
-        numpy.array: The depth map estimated by MiDaS_small as a numpy.array of
-            floats.
+        NDArray[(Any, Any), np.float32]: The inverse depth map estimated by
+            MiDaS.
     """
-    return midas(img, midas_model_small, midas_transforms_small)
+    return midas(rgb_img, midas_model_small, midas_transforms_small)

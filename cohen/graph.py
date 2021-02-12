@@ -19,7 +19,7 @@ def format_adjacency_map(V: set, E: dict):
                 s += '\n'
         return s
 
-def all_simple_paths_recursive_worker(G: Graph, src, dst, path, visited: set):
+def all_simple_paths_recursive_worker(G: Graph, src, dst, path: list, visited: set):
     if src == dst:
         return [path.copy()]
     else:
