@@ -10,14 +10,14 @@ def adjacency_map(V: set):
     return { v : dict() for v in V }
 
 def format_adjacency_map(V: set, E: dict):
-        s = str()
-        for u in sorted(V):
-            s += str(u) + ':\n'
-            for v in sorted(V):
-                s += '\t' + str(v) + ': '
-                s += str(E.get(u).get(v) if u in E else None)
-                s += '\n'
-        return s
+    s = str()
+    for u in sorted(V):
+        s += str(u) + ':\n'
+        for v in sorted(V):
+            s += '\t' + str(v) + ': '
+            s += str(E.get(u).get(v) if u in E else None)
+            s += '\n'
+    return s
 
 def all_simple_paths_recursive_worker(G: Graph, src, dst, path: list, visited: set):
     if src == dst:
