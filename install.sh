@@ -2,10 +2,29 @@
 sudo apt-get update -y
 sudo apt-get upgrade -y
 
-# add and install java
-sudo add-apt-repository -y ppa:webupd8team/java
-sudo apt-get update
-sudo apt-get install oracle-java8-installer -y
+# install java jdk v1.8.0
+sudo apt-get install openjdk-8-jdk
+
+# check if 'java' is set to the correct version
+# java check script retrieved from https://stackoverflow.com/questions/7334754/correct-way-to-check-java-version-from-bash-script
+# with necessary alterations
+
+if type -p java; then
+    _java=java
+elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]]; then
+    _java="$JAVA_HOME/bin/java"
+else
+    echo "Java Not Found"
+fi
+
+if [[ "$_java" ]]; then
+    version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    if [[ "$version" > "1.8" ]]; then
+        sudo update-alternatives --remove-all java
+        sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java 1
+    else
+        echo "Java set to 1.8.0 already"
+fi
 
 # install zookeeper
 sudo apt-get install zookeeperd
