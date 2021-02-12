@@ -19,22 +19,21 @@ def format_adjacency_map(V: set, E: dict):
             s += '\n'
     return s
 
-def all_simple_paths_recursive_worker(G: Graph, src, dst, path: list, visited: set):
-    if src == dst:
-        return [path.copy()]
-    else:
-        paths = []
-        for node in G.E[src].keys():
-            if node not in visited:
-                path.append(node)
-                visited.add(node)
-                paths.extend(all_simple_paths_recursive_worker(G, node, dst, path, visited))
-                visited.remove(node)
-                path.pop()
-        return paths
-
 def all_simple_paths_recursive(G: Graph, src, dst):
-    return all_simple_paths_recursive_worker(G, src, dst, [src], {src})
+    def worker(G: Graph, src, dst, path: list, visited: set):
+        if src == dst:
+            return [path.copy()]
+        else:
+            paths = []
+            for node in G.E[src].keys():
+                if node not in visited:
+                    path.append(node)
+                    visited.add(node)
+                    paths.extend(worker(G, node, dst, path, visited))
+                    visited.remove(node)
+                    path.pop()
+            return paths
+    return worker(G, src, dst, [src], {src})
 
 def all_simple_paths_iterative(G: Graph, src, dst):
     paths = []
@@ -61,20 +60,19 @@ def all_simple_paths_iterative(G: Graph, src, dst):
                 path.pop()
     return paths
 
-def all_simple_path_costs_recursive_worker(G: Graph, src, dst, cost, visited: set):
-    if src == dst:
-        return [cost]
-    else:
-        costs = []
-        for node in G.E[src].keys():
-            if node not in visited:
-                visited.add(node)
-                costs.extend(all_simple_path_costs_recursive_worker(G, node, dst, cost + G.E[src][node], visited))
-                visited.remove(node)
-        return costs
-
 def all_simple_path_costs_recursive(G: Graph, src, dst, initial_cost):
-    return all_simple_path_costs_recursive_worker(G, src, dst, initial_cost, {src})
+    def worker(G: Graph, src, dst, cost, visited: set):
+        if src == dst:
+            return [cost]
+        else:
+            costs = []
+            for node in G.E[src].keys():
+                if node not in visited:
+                    visited.add(node)
+                    costs.extend(worker(G, node, dst, cost + G.E[src][node], visited))
+                    visited.remove(node)
+            return costs
+    return worker(G, src, dst, initial_cost, {src})
 
 def all_simple_path_costs_iterative(G: Graph, src, dst, initial_cost):
     costs = []
