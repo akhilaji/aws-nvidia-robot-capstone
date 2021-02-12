@@ -6,6 +6,9 @@ sudo apt-get upgrade -y
 sudo apt-get install openjdk-8-jdk
 
 # check if 'java' is set to the correct version
+# java check script retrieved from https://stackoverflow.com/questions/7334754/correct-way-to-check-java-version-from-bash-script
+# with necessary alterations
+
 if type -p java; then
     _java=java
 elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]]; then
