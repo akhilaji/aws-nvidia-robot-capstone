@@ -2,23 +2,24 @@
 
 """
 
+from typing import Any
+
 import open3d
 import numpy as np
 from nptyping import NDArray
-from typing import Any, Tuple
 
 def project_point(
-        u: int, v: int, d: float,
-        fx: float, fy: float,
+        u: int, v: int, d: np.float32,
+        fx: np.float32, fy: np.float32,
         cx: int, cy: int
-    ) -> Tuple[float, float, float]:
+    ) -> NDArray[3, np.float32]:
     """
     
     """
     xz = (cx - u) / fx
     yz = (cy - v) / fy
     z = d / np.sqrt(1.0 + xz**2 + yz**2)
-    return xz * z, yz * z, z
+    return np.array([xz * z, yz * z, z], dtype=np.float32)
 
 def np_to_o3d_rgb_image(
         np_rgb_image: NDArray[(Any, Any, 3), np.uint8],
@@ -26,9 +27,9 @@ def np_to_o3d_rgb_image(
     return open3d.geometry.Image((np_rgb_image / 255.0).astype(np.float32))
 
 def np_to_o3d_depth_map(
-        midas_depth_map: NDArray[(Any, Any), np.float32]
+        np_depth_map: NDArray[(Any, Any), np.float32]
     ) -> open3d.geometry.Image:
-    return open3d.geometry.Image(midas_depth_map.astype(np.float32))
+    return open3d.geometry.Image(np_depth_map.astype(np.float32))
 
 def construct_point_cloud_from_color_and_depth(
         np_rgb_image: NDArray[(Any, Any, 3), np.uint8],
