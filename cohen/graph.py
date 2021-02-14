@@ -56,6 +56,20 @@ def all_simple_paths_recursive(G: Graph, src, dst) -> list:
             return paths
     return worker(G, src, dst, [src], {src})
 
+def all_simple_path_costs_recursive(G: Graph, src, dst, initial_cost) -> list:
+    def worker(G: Graph, src, dst, cost, visited: set) -> list:
+        if src == dst:
+            return [cost]
+        else:
+            costs = []
+            for node in G.E[src].keys():
+                if node not in visited:
+                    visited.add(node)
+                    costs.extend(worker(G, node, dst, cost + G.E[src][node], visited))
+                    visited.remove(node)
+            return costs
+    return worker(G, src, dst, initial_cost, {src})
+
 def all_simple_paths_iterative(G: Graph, src, dst) -> list:
     paths = []
     path = [src]
@@ -80,20 +94,6 @@ def all_simple_paths_iterative(G: Graph, src, dst) -> list:
                 fringe.pop()
                 path.pop()
     return paths
-
-def all_simple_path_costs_recursive(G: Graph, src, dst, initial_cost) -> list:
-    def worker(G: Graph, src, dst, cost, visited: set) -> list:
-        if src == dst:
-            return [cost]
-        else:
-            costs = []
-            for node in G.E[src].keys():
-                if node not in visited:
-                    visited.add(node)
-                    costs.extend(worker(G, node, dst, cost + G.E[src][node], visited))
-                    visited.remove(node)
-            return costs
-    return worker(G, src, dst, initial_cost, {src})
 
 def all_simple_path_costs_iterative(G: Graph, src, dst, initial_cost) -> list:
     costs = []
@@ -120,11 +120,3 @@ def all_simple_path_costs_iterative(G: Graph, src, dst, initial_cost) -> list:
                 visited.pop(curr)
                 fringe.pop()
     return costs
-
-def average_simple_path_cost_recursive(G: Graph, src, dst, initial_cost):
-    costs = all_simple_path_costs_recursive(G, src, dst, initial_cost)
-    return sum(costs) / len(costs)
-
-def average_simple_path_cost_iterative(G: Graph, src, dst, initial_cost):
-    costs = all_simple_path_costs_iterative(G, src, dst, initial_cost)
-    return sum(costs) / len(costs)
