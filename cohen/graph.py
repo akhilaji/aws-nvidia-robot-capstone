@@ -1,36 +1,17 @@
-"""
-This module defines the Graph class and utility functions for its usage in
-reconstructing scenes.
-
-
-
-"""
-
 from typing import Dict
 
 class Graph:
-    """
-    Container class for the set of nodes V, and edge adjacency dictionary E.
-    The edge adjacency dictionary E maps each node v1 in V to another
-    dictionary where for each node v2 in V that if there exists an edge
-    spanning from v1 to v2 then v2 is mapped to that edge's weight.
-    """
-
-    def __init__(self, V: set, E: dict):
+    def __init__(self: Graph, V: set, E: Dict[Dict]) -> None:
         self.V = V
         self.E = E
 
-    def __str__(self):
+    def __str__(self: Graph) -> str:
         return format_adjacency_map(self.V, self.E)
 
 def adjacency_map(V: set) -> Dict[Dict]:
-    """
-    Constructs an empty edge adjacency map. Meaning it constructs a dictionary
-    where each node in V is mapped to an empty dictionary.
-    """
     return { v : dict() for v in V }
 
-def format_adjacency_map(V: set, E: dict) -> str:
+def format_adjacency_map(V: set, E: Dict[Dict]) -> str:
     s = str()
     for u in sorted(V):
         s += str(u) + ':\n'

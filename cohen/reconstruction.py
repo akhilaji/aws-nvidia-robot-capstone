@@ -44,9 +44,6 @@ def construct_point_cloud_from_color_and_depth(
         depth_scale: float=1000.0, depth_trunc: float=1000.0,
         project_valid_depth_only: bool=False
     ) -> open3d.geometry.PointCloud:
-    """
-
-    """
     o3d_rgb_image = np_to_o3d_rgb_image(np_rgb_image)
     o3d_depth_map = np_to_o3d_depth_map(np_depth_map)
     pt_cloud = open3d.geometry.PointCloud.create_from_rgbd_image(

@@ -1,9 +1,4 @@
-"""
-
-"""
-
 from typing import Any, Callable
-
 import numpy as np
 from nptyping import NDArray
 import calibration
