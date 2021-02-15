@@ -2,7 +2,7 @@
 
 """
 
-from typing import Any
+from typing import Any, Callable
 
 import open3d
 import numpy as np
@@ -11,7 +11,7 @@ from nptyping import NDArray
 class SceneReconstructor:
     def __init__(
             self: SceneReconstructor,
-            fx: float, fy: float,
+            fx: np.float32, fy: np.float32,
             cx: int, cy: int
         ):
         self.fx = fx
@@ -29,6 +29,11 @@ class SceneReconstructor:
             self: SceneReconstructor
         ):
         pass
+
+    def get_point_projector(
+            self: SceneReconstructor,
+        ) -> Callable[[int, int, np.float32], NDArray[3, np.float32]]:
+        return lambda u, v, d : project_point(u, v, d, self.fx, self.fy, self.cx, self.cy)
 
 def project_point(
         u: int, v: int, d: np.float32,
