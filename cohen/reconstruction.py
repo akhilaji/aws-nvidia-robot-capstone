@@ -7,46 +7,25 @@ from typing import Any, Callable
 import open3d
 import numpy as np
 from nptyping import NDArray
+import calibration
 
 class SceneReconstructor:
     def __init__(
             self: SceneReconstructor,
-            fx: np.float32, fy: np.float32,
-            cx: int, cy: int
-        ):
-        self.fx = fx
-        self.fy = fy
-        self.cx = cx
-        self.cy = cy
+            camera: calibration.Camera
+        ) -> None:
+        self.camera = camera
 
     def add_frame(
             self: SceneReconstructor,
             rgb_img: NDArray[(Any, Any, 3), np.uint8]
-        ):
+        ) -> None:
         pass
 
     def finalize(
             self: SceneReconstructor
-        ):
+        ) -> None:
         pass
-
-    def get_point_projector(
-            self: SceneReconstructor,
-        ) -> Callable[[int, int, np.float32], NDArray[3, np.float32]]:
-        return lambda u, v, d : project_point(u, v, d, self.fx, self.fy, self.cx, self.cy)
-
-def project_point(
-        u: int, v: int, d: np.float32,
-        fx: np.float32, fy: np.float32,
-        cx: int, cy: int
-    ) -> NDArray[3, np.float32]:
-    """
-    
-    """
-    xz = (cx - u) / fx
-    yz = (cy - v) / fy
-    z = d / np.sqrt(1.0 + xz**2 + yz**2)
-    return np.array([xz * z, yz * z, z], dtype=np.float32)
 
 def np_to_o3d_rgb_image(
         np_rgb_image: NDArray[(Any, Any, 3), np.uint8],
