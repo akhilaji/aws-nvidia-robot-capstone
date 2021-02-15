@@ -20,6 +20,4 @@ def characteristic_point_canny(
             if canny_edges[y][x]:
                 pt_sum += pt_projector(x, y, depth_map[y][x])
                 pt_count += 1
-    print(pt_sum)
-    print(pt_count)
     return pt_sum / pt_count
