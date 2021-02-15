@@ -4,9 +4,14 @@ from nptyping import NDArray
 
 class SceneReconstructor:
     def __init__(
-            self: SceneReconstructor
+            self: SceneReconstructor,
+            fx: np.float32, fy: np.float32,
+            cx: int, cy: int
         ):
-        pass
+        self.fx = fx
+        self.fy = fy
+        self.cx = cx
+        self.cy = cy
 
     def add_frame(
             self: SceneReconstructor,
