@@ -5,7 +5,7 @@ from nptyping import NDArray
 class SceneReconstructor:
     def __init__(
             self: SceneReconstructor,
-            fx: np.float32, fy: np.float32,
+            fx: float, fy: float,
             cx: int, cy: int
         ):
         self.fx = fx
