@@ -1,26 +1,27 @@
-"""
-
-"""
-
-from typing import Any, Callable
-
-import open3d
-import numpy as np
+from typing import Any, Callable, List, Tuple
 from nptyping import NDArray
+
+import numpy as np
+import open3d
+
 import calibration
+import depth
 
 class SceneReconstructor:
     def __init__(
             self: SceneReconstructor,
-            camera: calibration.Camera
+            camera: calibration.Camera,
+            history: List[Tuple[NDArray[(Any, Any, 3), np.uint8], NDArray[(Any, Any), np.float32]]]
         ) -> None:
         self.camera = camera
+        self.history = history
 
     def add_frame(
             self: SceneReconstructor,
             rgb_img: NDArray[(Any, Any, 3), np.uint8]
         ) -> None:
-        pass
+        depth_map = depth.midas_small(rgb_img)
+        self.history.append((rgb_img, depth_map))
 
     def finalize(
             self: SceneReconstructor
