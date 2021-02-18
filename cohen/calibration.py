@@ -1,10 +1,10 @@
 from typing import Any
 from nptyping import NDArray
+
 import numpy as np
 
 class Intrinsics:
-    def __init__(
-            self: Intrinsics,
+    def __init__(self,
             fx: np.float32, fy: np.float32,
             cx: int, cy: int
         ) -> None:
@@ -14,21 +14,18 @@ class Intrinsics:
         self.cy = cy
 
 class Extrinsics:
-    def __init__(
-            self: Extrinsics,
+    def __init__(self
         ) -> None:
         pass
 
 class Camera:
-    def __init__(
-            self: Camera,
+    def __init__(self,
             intr: Intrinsics, extr: Extrinsics
         ) -> None:
         self.intr = intr
         self.extr = extr
     
-    def project(
-            self: Camera,
+    def project(self,
             u: int, v: int, d: np.float32
         ) -> NDArray[3, np.float32]:
         xz = (self.intr.cx - u) / self.intr.fx

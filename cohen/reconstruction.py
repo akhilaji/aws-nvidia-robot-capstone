@@ -8,30 +8,24 @@ import calibration
 import depth
 
 class SceneReconstructor:
-    def __init__(
-            self: SceneReconstructor,
-            camera: calibration.Camera,
-            history: List[Tuple[NDArray[(Any, Any, 3), np.uint8], NDArray[(Any, Any), np.float32]]]
+    def __init__(self,
+            camera: calibration.Camera
         ) -> None:
         self.camera = camera
-        self.history = history
 
-    def add_frame(
-            self: SceneReconstructor,
+    def add_frame(self,
             rgb_img: NDArray[(Any, Any, 3), np.uint8]
         ) -> None:
         depth_map = depth.midas_small(rgb_img)
-        self.history.append((rgb_img, depth_map))
 
-    def finalize(
-            self: SceneReconstructor
+    def finalize(self
         ) -> None:
         pass
 
 def np_to_o3d_rgb_image(
         np_rgb_image: NDArray[(Any, Any, 3), np.uint8],
     ) -> open3d.geometry.Image:
-    return open3d.geometry.Image((np_rgb_image / 255.0).astype(np.float32))
+    return open3d.geometry.Image(np_rgb_image)
 
 def np_to_o3d_depth_map(
         np_depth_map: NDArray[(Any, Any), np.float32]
@@ -43,22 +37,18 @@ def construct_point_cloud_from_color_and_depth(
         np_depth_map: NDArray[(Any, Any), np.float32],
         camera_intrinsics: open3d.camera.PinholeCameraIntrinsic,
         depth_scale: float=1000.0, depth_trunc: float=1000.0,
+        convert_rgb_to_intensity: bool=False,
         project_valid_depth_only: bool=False
     ) -> open3d.geometry.PointCloud:
-    o3d_rgb_image = np_to_o3d_rgb_image(np_rgb_image)
-    o3d_depth_map = np_to_o3d_depth_map(np_depth_map)
     pt_cloud = open3d.geometry.PointCloud.create_from_rgbd_image(
         open3d.geometry.RGBDImage.create_from_color_and_depth(
-            o3d_rgb_image,
-            o3d_depth_map,
+            np_to_o3d_rgb_image(np_rgb_image),
+            np_to_o3d_depth_map(np_depth_map),
             depth_scale=depth_scale,
-            depth_trunc=depth_trunc
+            depth_trunc=depth_trunc,
+            convert_rgb_to_intensity=convert_rgb_to_intensity
         ),
         camera_intrinsics,
         project_valid_depth_only=project_valid_depth_only
-    )
-    o3d_rgb_array = np.asarray(o3d_rgb_image)
-    pt_cloud.colors = open3d.utility.Vector3dVector(
-        o3d_rgb_array.reshape(o3d_rgb_array.size // 3, 3).astype(np.float64)
     )
     return pt_cloud

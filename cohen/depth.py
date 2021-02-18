@@ -31,10 +31,11 @@ Attributes:
         torch.hub.load('intel-isl/MiDaS', 'MiDaS_small').
 """
 
-import torch
-import numpy as np
-from nptyping import NDArray
 from typing import Any
+from nptyping import NDArray
+
+import numpy as np
+import torch
 
 midas_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 midas_transforms = torch.hub.load('intel-isl/MiDaS', 'transforms')

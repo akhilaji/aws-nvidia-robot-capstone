@@ -1,11 +1,11 @@
 from typing import Dict
 
 class Graph:
-    def __init__(self: Graph, V: set, E: Dict[Dict]) -> None:
+    def __init__(self, V: set, E: Dict[Dict]) -> None:
         self.V = V
         self.E = E
 
-    def __str__(self: Graph) -> str:
+    def __str__(self) -> str:
         return format_adjacency_map(self.V, self.E)
 
 def adjacency_map(V: set) -> Dict[Dict]:
