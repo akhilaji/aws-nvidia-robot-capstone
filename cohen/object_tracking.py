@@ -1,8 +1,17 @@
-from nptyping import NDArray
-from typing import Any, List, Tuple
+from typing import Any, List, NamedTuple, Tuple
 
 import cv2
 import numpy as np
+from nptyping import NDArray
+
+import util
+from object_detection import BoundingBox
+
+class ObjectDetection(NamedTuple):
+    rgb: NDArray[(Any, Any, 3), np.uint8]
+    pos: NDArray[2, np.float32]
+    bbox: BoundingBox
+    obj_class: str
 
 class ObjectTracker:
     def __init__(self,
@@ -17,25 +26,67 @@ class ObjectTracker:
         self.objects = dict()
         self.objects.setdefault(dict())
 
+    def centroid(self, bbox: BoundingBox) -> NDArray[2, np.float32]:
+        """
+        Gets the centroid of a BoundingBox. Note: a centroid is simply the
+        center point of a BoundingBox.
+
+        Args:
+            bbox (BoundingBox): The BoundingBox to get the center point of.
+                BoundingBox is a NamedTuple of 4 ints: x, y, w, h.
+        
+        Returns:
+            NDArray[2, np.float32]: The centroid or center point of the given
+                BoundingBox as a numpy array of floats.
+        """
+        return np.array([bbox.x + bbox.w / 2.0, bbox.y + bbox.h / 2.0], np.float32)
+
+    def closest_centroid(self,
+            frame_id: int, curr_centroid: NDArray[2, np.float32]
+        ) -> int:
+        """
+        Gets the object id of the object with centroid closest to the given
+        centroid within a specified frame.
+
+        Args:
+            frame_id (int): The frame to look for centroids in.
+
+            curr_centroid (NDArray[2, np.float32]): The centroid to find the
+                closest of.
+        
+        Returns:
+            int: The object id with the closest centroid in the specified frame.
+        """
+        closest_dist, closest_id = float('inf'), None
+        for obj_id in self.in_frame[frame_id]:
+            diff = curr_centroid - self.centroid(self.objects[obj_id][frame_id].bbox)
+            dist = np.linalg.dot(diff, diff)
+            if dist < closest_dist:
+                closest_dist = dist
+                closest_id = obj_id
+        return closest_id
+
     def add_frame(self,
-            rgb_frame: NDArray[(Any, Any, 3), np.uint8],
-            obj_detections: List[Tuple[str, Tuple[int, int, int, int], Tuple[float, float, float]]]
+            rgb_img: NDArray[(Any, Any, 3), np.uint8],
+            obj_detections: List[ObjectDetection]
         ) -> None:
-        for obj_class, bbox, pt in obj_detections:
-            match = self.find_match(self.frame_id_counter, obj_class, bbox, pt)
-            if match == self.obj_id_counter:
+        if self.frame_id_counter - 1 not in self.in_frame:
+            for obj_detection in obj_detections:
+                self.objects[self.obj_id_counter][self.frame_id_counter] = obj_detection
+                self.in_frame[self.frame_id_counter].add(self.obj_id_counter)
                 self.obj_id_counter += 1
-            self.objects[match][self.frame_id_counter] = (obj_class, bbox, pt)
-            self.in_frame[self.frame_id_counter].add(match)
+        elif len(obj_detections) > len(self.in_frame[self.frame_id_counter - 1]):
+            pass
+        elif len(obj_detections) < len(self.in_frame[self.frame_id_counter - 1]):
+            pass
+        else:
+            pass
         self.frame_id_counter += 1
 
-    def find_match(self,
-            frame_id: int,
-            obj_class: str,
-            bbox: Tuple[int, int, int, int],
-            pt: Tuple[float, float, float]
-        ) -> int:
-        return self.obj_id_counter
+    def predict_centroid(self,
+            obj_id: int
+        ) -> Tuple[float, float]:
+        pass
 
 def run_tracking(
         cap: cv2.VideoCapture,
