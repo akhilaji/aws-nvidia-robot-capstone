@@ -1,4 +1,5 @@
 import cv2
+import sys
 
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
@@ -22,9 +23,9 @@ def emit_video(video_feed):
         if not success:
             break
 
-        data = cv2.imencode('.jpeg', frame)[1].tobytes()
+        ret, data = cv2.imencode('.jpg', frame)
 
-        future = producer.send(topic, data)
+        future = cam_producer.send(topic, data.tobytes())
         try:
             future.get(timeout=10)
         except KafkaError as e:
@@ -38,3 +39,6 @@ def main():
             emit_video(video)
     else:
         emit_video(0)
+
+if __name__ == "__main__":
+    main()
