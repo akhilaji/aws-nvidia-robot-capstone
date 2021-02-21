@@ -1,6 +1,6 @@
 from kafka import KafkaConsumer
 
-obj_consumer = KafkaConsumer('vidInput',
+obj_consumer = KafkaConsumer('camera-feed',
                              group_id='camera-group',
                              bootstrap_servers=['localhost:9092'])
 
@@ -10,4 +10,8 @@ for msg in consumer:
 
     print("%s:%d%d: key=%s value=%s" %(msg.topic, msg.partition,
                                        msg.offset, msg.key,
-                                       msg.value.decode('utf-8')))
+                                       msg.value))
+
+    # save the image
+    img = cv2.imdecode(msg.value, 1)
+    cv2.imwrite("image.jpeg", img)
