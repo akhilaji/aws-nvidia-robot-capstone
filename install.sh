@@ -27,7 +27,6 @@ sudo apt-get install openjdk-8-jdk
 
 
 # install tools
-sudo apt-get install zookeeperd
 sudo apt-get install net-tools
 sudo apt install git wget build-essential　python3-dev python3-pip
 sudo apt install libopencv-dev
