@@ -58,9 +58,11 @@ cd ../
 
 
 
-# download and install kafka
-wget https://downloads.apache.org/kafka/2.7.0/kafka-2.7.0-src.tgz
-sudo mkdir /opt/Kafka
-ls
-sudo tar -xvf kafka-2.7.0-src.tgz -C /opt/Kafka/
-rm -rf kafka-2.7.0-src.tgz
+# Apache Kafka Installation
+cd ~/Downloads/
+wget http://apache.claz.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
+
+sudo mkdir /opt/kafka
+sudo tar -xvf kafka_2.13-2.7.0.tgz -C /opt/kafka
+
+rm -rf kafka_2.13-2.7.0.tgz
