@@ -4,7 +4,7 @@ import sys
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
-topic = 'camera-feed'
+topic = 'vidInput'
 cam_producer = KafkaProducer(bootstrap_servers=['localhost:9092'])
 
 def emit_video(video_feed):

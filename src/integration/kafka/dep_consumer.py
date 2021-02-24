@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from kafka import KafkaConsumer
 
-dep_consumer = KafkaConsumer('camera-feed',
-                             group_id='camera-group',
+dep_consumer = KafkaConsumer('vidInput',
+                             group_id='depth-group',
                              bootstrap_servers=['localhost:9092'])
 
 for msg in dep_consumer:
@@ -18,4 +18,4 @@ for msg in dep_consumer:
     nparr = np.fromstring(msg.value, np.uint8)
     image_np = cv2.imdecode(nparr, 1)
 
-    cv2.imwrite("image.jpg"., image_np)
+    cv2.imwrite("image.jpg", image_np)
