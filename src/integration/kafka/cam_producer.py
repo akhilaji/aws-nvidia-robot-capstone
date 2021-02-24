@@ -34,9 +34,8 @@ def emit_video(video_feed):
     print('.', end='', flush=True)
 
 def main():
-    if len(sys.argv) > 2:
-        for video in sys.argv:
-            emit_video(video)
+    if len(sys.argv) == 2:
+        emit_video(sys.argv[1])
     else:
         emit_video(0)
 
