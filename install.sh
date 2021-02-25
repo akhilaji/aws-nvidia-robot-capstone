@@ -27,7 +27,6 @@ sudo apt-get install openjdk-8-jdk
 
 
 # install tools
-sudo apt-get install zookeeperd
 sudo apt-get install net-tools
 sudo apt install git wget build-essential　python3-dev python3-pip
 sudo apt install libopencv-dev
@@ -59,9 +58,11 @@ cd ../
 
 
 
-# download and install kafka
-wget https://downloads.apache.org/kafka/2.7.0/kafka-2.7.0-src.tgz
-sudo mkdir /opt/Kafka
-ls
-sudo tar -xvf kafka-2.7.0-src.tgz -C /opt/Kafka/
-rm -rf kafka-2.7.0-src.tgz
+# Apache Kafka Installation
+cd ~/Downloads/
+wget http://apache.claz.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
+
+sudo mkdir /opt/kafka
+sudo tar -xvf kafka_2.13-2.7.0.tgz -C /opt/kafka
+
+rm -rf kafka_2.13-2.7.0.tgz
