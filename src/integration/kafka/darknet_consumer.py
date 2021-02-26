@@ -1,7 +1,10 @@
 from flask import Flask, Response
 from kafka import KafkaConsumer
+import numpy as np
+import cv2
 
-consumer = KafkaConsumer('vidInput', bootstrap_servers='localhost:9092')
+
+consumer = KafkaConsumer('vidInput', bootstrap_servers='localhost:9092', group_id='detection-group')
 
 app = Flask(__name__)
 
