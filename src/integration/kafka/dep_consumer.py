@@ -15,7 +15,7 @@ for msg in dep_consumer:
                                        msg.value))
 
     # decode message data (bytes -> jpg)
-    nparr = np.fromstring(msg.value, np.uint8)
+    nparr = np.frombuffer(msg.value, np.uint8)
     depth.midas_small(nparr)
     image_np = cv2.imdecode(nparr, 1)
 
