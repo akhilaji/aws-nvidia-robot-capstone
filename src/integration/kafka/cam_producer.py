@@ -12,19 +12,16 @@ def emit_video(video_feed):
 
     # set video properties
     video.set(cv2.CAP_PROP_AUTOFOCUS, 1) # enable external camera autofocus
-    video.set(3, 608) # horizontal resolution
-    video.set(4, 608) # vertical resolution
 
-    frame = 0
     while video.isOpened():
         success, frame = video.read()
-        frame += 1
-
+        frame = cv2.resize(frame, (608, 608)) 
+        
         if not success:
             break
 
         ret, data = cv2.imencode('.jpg', frame)
-
+        print(frame.shape)
         future = cam_producer.send(topic, data.tobytes())
         try:
             future.get(timeout=10)
