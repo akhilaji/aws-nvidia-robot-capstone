@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
 from kafka import KafkaConsumer
+
 from matplotlib import image, patches, pyplot as plt
 import tensorflow as tensorflow
-physical_devices = tf.config.experimental.list_physical_devices('GPU')
 from darknetpy.detector import Detector
 
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
 
 detector = Detector(
     '/home/akhil/darknet/cfg/obj.data',
