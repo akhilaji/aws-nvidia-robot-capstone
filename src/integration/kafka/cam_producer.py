@@ -15,7 +15,6 @@ def emit_video(video_feed):
 
     while video.isOpened():
         success, frame = video.read()
-        frame = cv2.resize(frame, (608, 608)) 
         
         if not success:
             break
