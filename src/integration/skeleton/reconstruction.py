@@ -43,4 +43,3 @@ def construct_point_cloud_from_color_and_depth(
         project_valid_depth_only=project_valid_depth_only
     )
     return pt_cloud
-
