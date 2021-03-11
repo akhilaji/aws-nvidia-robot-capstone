@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 from kafka import KafkaConsumer
 import depth
+
+import matplotlib.pyplot as plt
+
 dep_consumer = KafkaConsumer('vidInput',
                              group_id='depth-group',
                              bootstrap_servers=['localhost:9092'])
@@ -25,4 +28,4 @@ for msg in dep_consumer:
 
     # perform depth detection
     depth_map = depth.midas_large(data)
-    print(depth_map)
+    plt.imsave('image.png', depth_map)
