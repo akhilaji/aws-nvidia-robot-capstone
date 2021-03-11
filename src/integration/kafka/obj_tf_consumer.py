@@ -89,6 +89,7 @@ def main(_argv):
             score_threshold=FLAGS.score
         )
         pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
+        print(pred_bbox)
 
         # read in all class names from config
         class_names = utils.read_class_names(cfg.YOLO.CLASSES)
@@ -101,11 +102,11 @@ def main(_argv):
 
         image = utils.draw_bbox(original_image, pred_bbox, allowed_classes = allowed_classes)
 
-        image = Image.fromarray(image.astype(np.uint8))
-        if not FLAGS.dont_show:
-            image.show()
-        image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
-        cv2.imwrite(FLAGS.output + 'detection' + str(count) + '.png', image)
+        #image = Image.fromarray(image.astype(np.uint8))
+        #if not FLAGS.dont_show:
+        #    image.show()
+        #image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
+        #cv2.imwrite(FLAGS.output + 'detection' + str(count) + '.png', image)
         # save the image
         #img = cv2.imdecode(msg.value, 1)
         #cv2.imwrite("objimage.jpeg", image_np)
