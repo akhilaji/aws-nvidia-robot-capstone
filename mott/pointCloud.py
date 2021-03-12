@@ -3,7 +3,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-pt_cloud = o3d.io.read_point_cloud('mott/rapture.ply')  # load point cloud 
+pt_cloud = o3d.io.read_point_cloud('mott/0020.ply')  # load point cloud 
 
 o3d.visualization.draw_geometries([pt_cloud])  
 
