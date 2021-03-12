@@ -8,7 +8,7 @@ class Graph:
     def __str__(self) -> str:
         return format_adjacency_map(self.V, self.E)
 
-def adjacency_map(V: Set[Any]) -> Dict[Dict[Any, Any]]:
+def adjacency_map(V: Set[Any]) -> Dict[Any, Dict[Any, Any]]:
     return { v : dict() for v in V }
 
 def format_adjacency_map(V: Set[Any], E: Dict[Any, Dict[Any, Any]]) -> str:
@@ -101,3 +101,6 @@ def all_simple_path_costs_iterative(G: Graph, src: Any, dst: Any, initial_cost: 
                 visited.pop(curr)
                 fringe.pop()
     return costs
+
+all_simple_paths = all_simple_paths_iterative
+all_simple_path_costs = all_simple_path_costs_iterative

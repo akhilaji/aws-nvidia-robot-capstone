@@ -31,9 +31,15 @@ class ObjectDetection(NamedTuple):
             information. Contains attributes x, y, w, h in that order.
         
         obj_class (str): The assigned object classification of this detection.
+
+        id (Any): The assigned id of this detection.
+
+        pt (NDArray[3, float]): 
     """
     bbox: BoundingBox
     obj_class: str
+    id: Any
+    pt: NDArray[3, float]
 
 class ObjectDetector:
     """
@@ -46,5 +52,27 @@ class ObjectDetector:
         Runs object detection on a numpy 3-channel RGB image and formats the
         results as a list of ObjectDection containing the BoundingBox information
         and the detected object class.
+        """
+        pass
+
+class ObjectTracker:
+    """
+
+    """
+
+    def track(self, detections: List[ObjectDetection]) -> None:
+        """
+
+        """
+        pass
+
+class PointPicker:
+    """
+
+    """
+
+    def pick(self, detections: List[ObjectDetection]) -> None:
+        """
+
         """
         pass

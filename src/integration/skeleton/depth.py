@@ -10,6 +10,7 @@ https://github.com/intel-isl/MiDaS/
 
 import numpy as np
 import torch
+
 from typing import Any
 from nptyping import NDArray
 
