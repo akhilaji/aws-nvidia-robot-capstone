@@ -1,10 +1,18 @@
 import cv2
 import numpy as np
 from kafka import KafkaConsumer
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
 import depth
+
+#consumer declaration to read image data as bytes from vidInput topic
 dep_consumer = KafkaConsumer('vidInput',
                              group_id='depth-group',
                              bootstrap_servers=['localhost:9092'])
+
+#declare a producer to pipe detection and bounding box data to depOutput topic
+topic = 'depOutput'
+dep_result_producer = KafkaProducer(bootstrap_servers=['localhost:9092'])
 
 for msg in dep_consumer:
     """

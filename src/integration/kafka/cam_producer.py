@@ -1,5 +1,6 @@
 import cv2
 import sys
+import datetime
 
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
@@ -22,6 +23,10 @@ def emit_video(video_feed):
 
         ret, data = cv2.imencode('.jpg', frame)
         print(frame.shape)
+
+
+        datetime_object = datetime.datetime.now()
+        #TODO: send datetime_object along with the image data
         future = cam_producer.send(topic, data.tobytes())
         try:
             future.get(timeout=10)

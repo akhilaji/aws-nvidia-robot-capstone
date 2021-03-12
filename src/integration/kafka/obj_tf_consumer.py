@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from kafka import KafkaConsumer
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
 import tensorflow as tf
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -17,10 +19,14 @@ import numpy as np
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
-
+#consumer declaration to read image data as bytes from vidInput topic
 obj_consumer = KafkaConsumer('vidInput',
                              group_id='detection-group',
                              bootstrap_servers=['localhost:9092'])
+
+#declare a producer to pipe detection and bounding box data to objOutput topic
+topic = 'objOutput'
+obj_result_producer = KafkaProducer(bootstrap_servers=['localhost:9092'])
 
 
 flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
