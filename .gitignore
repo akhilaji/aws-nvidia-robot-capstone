@@ -6,3 +6,5 @@ data/*
 
 # output files
 *.out
+
+venv/
