@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from kafka import KafkaConsumer
-import depth
+from apache import depth
 
 import matplotlib.pyplot as plt
 
