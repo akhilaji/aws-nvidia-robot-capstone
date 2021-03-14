@@ -33,5 +33,7 @@ for msg in dep_consumer:
     data = cv2.resize(nparr_img, (608,608))
 
     # perform depth detection
-    depth_map = depth.midas_large(data)
+    MidasEstimator = depth.construct_midas_large()
+    depth_map = MidasEstimator(data)
+    
     print(depth_map)

@@ -1,122 +1,94 @@
 """
-This module exists as a wrapper for obtaining depth information from RGB
-images.
-
-Requirements Installation:
-pip install torch===1.7.1 torchvision===0.8.2 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
-
-Example:
-    testing_depth_script.py:
-        import cv2
-        import depth
-
-        filename = 'test_file.jpg'
-        rgb_img = cv2.imread(filename)
-        depth_map = depth.midas_large(rgb_img)
-
-Attributes:
-    midas_device (torch.device): The torch.device to be used for applications of MiDaS.
-
-    midas_transforms (???): The image transforms to be used for transforming
-        images before giving them to the MiDaS model. Loaded from torch using
-        torch.hub.load('intel-isl/MiDaS', 'transforms').
-    
-    midas_transforms_large (???): The image transforms for use with the default
-        MiDaS model. Equivalent to midas_transforms.default_transform.
-    
-    midas_model_large (???): The default MiDaS model. Loaded from torch using
-        torch.hub.load('intel-isl/MiDaS', 'MiDaS').
-    
-    midas_model_small (???): The small MiDaS model. Loaded from torch using
-        torch.hub.load('intel-isl/MiDaS', 'MiDaS_small').
+https://github.com/intel-isl/MiDaS/
+@article{Ranftl2020,
+	author    = {Ren\'{e} Ranftl and Katrin Lasinger and David Hafner and Konrad Schindler and Vladlen Koltun},
+	title     = {Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer},
+	journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
+	year      = {2020},
+}
 """
-
-from typing import Any
-from nptyping import NDArray
 
 import numpy as np
 import torch
 
-midas_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-midas_transforms = torch.hub.load('intel-isl/MiDaS', 'transforms')
+from typing import Any
+from nptyping import NDArray
 
-midas_transforms_large = midas_transforms.default_transform
-midas_model_large = torch.hub.load('intel-isl/MiDaS', 'MiDaS')
-midas_model_large.to(midas_device)
-midas_model_large.eval()
-
-midas_transforms_small = midas_transforms.small_transform
-midas_model_small = torch.hub.load('intel-isl/MiDaS', 'MiDaS_small')
-midas_model_small.to(midas_device)
-midas_model_small.eval()
-
-def midas(
-        rgb_img: NDArray[(Any, Any, 3), np.uint8],
-        model, transforms
-    ) -> NDArray[(Any, Any), np.float32]:
+class DepthEstimator:
     """
-    Gets a single frame estimated depth map by applying the provided image
-    transforms and MiDaS model instance to an RGB image.
+    Callable wrapper for different depth estimation techniques.
+    """
 
-    Args:
-        rgb_img (NDArray[(Any, Any, 3), np.uint8]): The RGB image to apply the
-            MiDaS model to.
-        
-        model (???): The model loaded using torch.hub.load. Preloaded into
-            this module so should be either midas_model_large or
-            midas_model_small.
+    def __call__(self,
+            np_rgb_img: NDArray[(Any, Any, 3), np.uint8]
+        ) -> NDArray[(Any, Any), np.float]:
+        """
+        Estimates a depth map for a numpy 3-channel RGB image.
+        """
+        pass
 
-        transforms (???): The transforms as obtained by torch.hub.load.
-            Already loaded into this module so use either of the global
-            midas_transforms_large or midas_transforms_large declared
-            in this module depending on which variant of the MiDaS model
-            you want to use.
+class MidasDepthEstimator(DepthEstimator):
+    """
+    Callable wrapper for depth estimation using MiDaS loaded from torch.hub.
+
+    Attributes:
+        model: The model to be used. Assumed to be already be moved to device.
+            Designed to be obtained with torch.hub.
+
+        transforms (callable): Image transformations to process images before
+            being passed fed to the model.
+
+        device (torch.device): The device to run the model on. Since the model
+            is already assumed to be on this device before construction, is
+            only used as the destination to forward input batches to.
     
-    Returns:
-        NDArray[(Any, Any), np.float32]: The inverse depth map estimated by the
-            MiDaS model for the input RGB image.
+    https://github.com/intel-isl/MiDaS/
+    @article{Ranftl2020,
+        author    = {Ren\'{e} Ranftl and Katrin Lasinger and David Hafner and Konrad Schindler and Vladlen Koltun},
+        title     = {Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer},
+        journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
+        year      = {2020},
+    }
     """
-    input_batch = transforms(rgb_img).to(midas_device)
-    with torch.no_grad():
-        prediction = model(input_batch)
-        prediction = torch.nn.functional.interpolate(
-            prediction.unsqueeze(1),
-            size=rgb_img.shape[:2],
-            mode="bicubic",
-            align_corners=False,
-        ).squeeze()
-    return prediction.cpu().numpy()
+    def __init__(self, model, transforms, device) -> None:
+        self.model = model
+        self.transforms = transforms
+        self.device = device
 
-def midas_large(
-        rgb_img: NDArray[(Any, Any, 3), np.uint8]
-    ) -> NDArray[(Any, Any), np.float32]:
+    def __call__(self, np_rgb_img: NDArray[(Any, Any, 3), np.uint8]) -> NDArray[(Any, Any), np.float]:
+        """
+        Forwards a numpy RGB image to MiDaS and returns the inverse depth map
+        estimated by the model.
+        """
+        input_batch = self.transforms(np_rgb_img).to(self.device)
+        with torch.no_grad():
+            prediction = self.model(input_batch)
+            prediction = torch.nn.functional.interpolate(
+                prediction.unsqueeze(1),
+                size=np_rgb_img.shape[:2],
+                mode="bicubic",
+                align_corners=False,
+            ).squeeze()
+        return prediction.cpu().numpy()
+
+def construct_midas_large(device: torch.device = torch.device('cuda'), verbose: bool = False) -> MidasDepthEstimator:
     """
-    Performs a single frame depth map estimation by feeding an RGB image to the
-    default MiDaS model and returns the result.
-
-    Args:
-        rgb_img (NDArray[(Any, Any, 3), np.uint8]): The RGB image to feed to
-            MiDaS.
-
-    Returns:
-        NDArray[(Any, Any), np.float32]: The inverse depth map estimated by
-            MiDaS.
+    Factory function for creating a new instance of the DepthEstimator wrapper
+    class for MiDaS_small loaded from torch.hub.
     """
-    return midas(rgb_img, midas_model_large, midas_transforms_large)
+    transforms = torch.hub.load('intel-isl/MiDaS', 'transforms', verbose=verbose).default_transform
+    model = torch.hub.load('intel-isl/MiDaS', 'MiDaS', verbose=verbose)
+    model.to(device)
+    model.eval()
+    return MidasDepthEstimator(model, transforms, device)
 
-def midas_small(
-        rgb_img: NDArray[(Any, Any, 3), np.uint8]
-    ) -> NDArray[(Any, Any), np.float32]:
+def construct_midas_small(device: torch.device = torch.device('cuda'),  verbose: bool = False) -> MidasDepthEstimator:
     """
-    Performs a single frame depth map estimation by feeding an RGB image to the
-    small MiDaS model and returns the result.
-
-    Args:
-        rgb_img (NDArray[(Any, Any, 3), np.uint8]): The RGB image to feed to
-            MiDaS.
-
-    Returns:
-        NDArray[(Any, Any), np.float32]: The inverse depth map estimated by
-            MiDaS.
+    Factory function for creating a new instance of the DepthEstimator wrapper
+    class for MiDaS loaded from torch.hub.
     """
-    return midas(rgb_img, midas_model_small, midas_transforms_small)
+    transforms = torch.hub.load('intel-isl/MiDaS', 'transforms', verbose=verbose).small_transform
+    model = torch.hub.load('intel-isl/MiDaS', 'MiDaS_small', verbose=verbose)
+    model.to(device)
+    model.eval()
+    return MidasDepthEstimator(model, transforms, device)
