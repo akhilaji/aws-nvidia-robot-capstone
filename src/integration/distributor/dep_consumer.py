@@ -28,3 +28,4 @@ for msg in dep_consumer:
 
     # perform depth detection
     depth_map = depth.midas_large(data)
+    print(depth_map)
