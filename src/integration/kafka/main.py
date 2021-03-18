@@ -35,9 +35,8 @@ saved_model_loaded = tf.saved_model.load(
     model_path, tags=[tag_constants.SERVING])
 
 
-def get_depth(frame):
+def get_depth(MidasEstimator, frame):
     print("depth function")
-    MidasEstimator = depth.construct_midas_large()
     depth_map = MidasEstimator(frame)
     return depth_map
 
@@ -83,7 +82,6 @@ def get_object(_argv, data, config, session, input_size, images):
 
     # custom allowed classes (uncomment line below to allow detections for only people)
     #allowed_classes = ['person']
-
     image = utils.draw_bbox(original_image, pred_bbox,
                             allowed_classes=allowed_classes)
 
@@ -110,7 +108,7 @@ def main(_argv):
     input_size = 608
     images = FLAGS.images
 
-
+    MidasEstimator = depth.construct_midas_large()
     
     while video.isOpened():
         frame_time = datetime.datetime.now()
@@ -119,10 +117,10 @@ def main(_argv):
             break
         frame = cv2.resize(frame, dim)
 
-        depth = get_depth(frame)
+        depth_value = get_depth(MidasEstimator,frame)
         objects = get_object(_argv, frame, config, session, input_size, images)
 
-        #print(depth)
+        #print(depth_value)
         #print(objects)
 
         print(frame_time)
