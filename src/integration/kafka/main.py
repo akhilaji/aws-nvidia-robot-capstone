@@ -2,6 +2,8 @@ import os
 import sys
 import datetime
 import cv2
+import argparse
+import open3d
 import numpy as np
 import depth
 import matplotlib.pyplot as plt
@@ -18,6 +20,11 @@ from tensorflow.python.saved_model import tag_constants
 from PIL import Image
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
+
+from skeleton import depth
+from skeleton import graph
+from skeleton import reconstruction
+from skeleton import visualization
 
 
 flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
@@ -87,6 +94,16 @@ def get_object(_argv, data, config, session, input_size, images):
 
     return pred_bbox
 
+def depth_visualization(depth_map, inv_depth_map, frame):
+    img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    visualization.intensity_image(depth_map)
+    visualization.intensity_image(inv_depth_map)
+
+    height, width, _ = img.shape
+    print(width,height)
+    intr = open3d.camera.PinholeCameraIntrinsic(width=width, height=height, cx=width//2, cy=height//2, fx=1920.0, fy=1080.0)
+    pt_cloud = reconstruction.construct_point_cloud_from_color_and_depth(img, depth_map, intr)
+    open3d.visualization.draw_geometries([pt_cloud])
 
 def main(_argv):
     print("initializing services")
@@ -117,11 +134,16 @@ def main(_argv):
             break
         frame = cv2.resize(frame, dim)
 
+        #Calculate the depth map
         depth_value = get_depth(MidasEstimator,frame)
+        depth_map = 1.0/depth_value
+        depth_visualization(depth_map, depth_value, frame)
+        
         objects = get_object(_argv, frame, config, session, input_size, images)
 
         #print(depth_value)
         #print(objects)
+
 
         print(frame_time)
 
