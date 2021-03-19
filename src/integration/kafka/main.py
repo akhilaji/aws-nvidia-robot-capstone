@@ -1,12 +1,15 @@
 import os
 import sys
 import datetime
+import time
 import cv2
 import argparse
 import open3d
 import numpy as np
-import depth
+from PIL import Image
 import matplotlib.pyplot as plt
+from concurrent.futures import ThreadPoolExecutor
+
 import tensorflow as tf
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -17,10 +20,10 @@ import core.utils as utils
 from core.config import cfg
 from core.yolov4 import filter_boxes
 from tensorflow.python.saved_model import tag_constants
-from PIL import Image
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
+import depth
 from skeleton import depth
 from skeleton import graph
 from skeleton import reconstruction
@@ -31,10 +34,6 @@ flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
 flags.DEFINE_string('model', 'yolov4', 'yolov3 or yolov4')
 flags.DEFINE_list('images', './data/images/kite.jpg', 'path to input image')
 flags.DEFINE_string('output', './detections/', 'path to output folder')
-flags.DEFINE_float('iou', 0.45, 'iou threshold')
-flags.DEFINE_float('score', 0.25, 'score threshold')
-flags.DEFINE_boolean('dont_show', False, 'dont show image output')
-
 
 # load model
 model_path = "./yolov4-608"
@@ -46,7 +45,6 @@ def get_depth(MidasEstimator, frame):
     print("depth function")
     depth_map = MidasEstimator(frame)
     return depth_map
-
 
 def get_object(_argv, data, config, session, input_size, images):
     print("object detection function")
@@ -134,12 +132,16 @@ def main(_argv):
             break
         frame = cv2.resize(frame, dim)
 
+        executor = ThreadPoolExecutor(max_workers=2)
+        depth_value = executor.submit(get_depth(MidasEstimator,frame))
+        objects = executor.submit(get_object(_argv, frame, config, session, input_size, images))
+
         #Calculate the depth map
-        depth_value = get_depth(MidasEstimator,frame)
-        depth_map = 1.0/depth_value
-        depth_visualization(depth_map, depth_value, frame)
+        #depth_value = get_depth(MidasEstimator,frame)
+        #depth_map = 1.0/depth_value
+        #depth_visualization(depth_map, depth_value, frame)
         
-        objects = get_object(_argv, frame, config, session, input_size, images)
+        #objects = get_object(_argv, frame, config, session, input_size, images)
 
         #print(depth_value)
         #print(objects)

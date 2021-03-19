@@ -24,7 +24,7 @@ for msg in dep_consumer:
     	- key: The raw message key.
     	- value: The raw message value.
     '''
-    
+    print(msg.timestamp)
     # decode message data (bytes -> numpy.array)
     nparr = np.frombuffer(msg.value, np.uint8)
     nparr_img = cv2.imdecode(nparr, 1)
@@ -35,5 +35,5 @@ for msg in dep_consumer:
     # perform depth detection
     MidasEstimator = depth.construct_midas_large()
     depth_map = MidasEstimator(data)
-    
-    print(depth_map)
+    #print(depth_map)
+
