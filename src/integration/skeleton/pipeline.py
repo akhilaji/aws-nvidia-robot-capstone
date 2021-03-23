@@ -1,7 +1,7 @@
-from skeleton import depth
-from skeleton import detect
-from skeleton import pick
-from skeleton import track
+from skeleton.depth import DepthEstimator
+from skeleton.detect import ObjectDetector, ObjectDetection
+from skeleton.pick import PointPicker
+from skeleton.track import ObjectTracker
 
 import numpy as np
 
@@ -15,10 +15,10 @@ class DetectionPipeline:
     """
 
     def __init__(self,
-            object_detector: detect.ObjectDetector,
-            depth_estimator: depth.DepthEstimator,
-            point_picker: pick.PointPicker,
-            object_tracker: track.ObjectTracker,
+            object_detector: ObjectDetector,
+            depth_estimator: DepthEstimator,
+            point_picker: PointPicker,
+            object_tracker: ObjectTracker,
         ):
         self.object_detector = object_detector
         self.depth_estimator = depth_estimator
@@ -28,7 +28,7 @@ class DetectionPipeline:
     def __call__(self,
             frame: NDArray[(Any, Any, 3), np.uint8],
             intr
-        ) -> List[detect.ObjectDetection]:
+        ) -> List[ObjectDetection]:
         detections = self.object_detector(frame)
         depth_map = self.depth_estimator(frame)
         self.object_tracker(detections)

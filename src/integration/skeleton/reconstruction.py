@@ -7,8 +7,8 @@
 }
 """
 
-from skeleton import detect
-from skeleton import graph
+from skeleton.detect import ObjectDetection
+from skeleton.graph import Graph
 
 import numpy as np
 import open3d
@@ -21,10 +21,10 @@ class SceneReconstructor:
 
     """
 
-    def __init__(self, G: graph.Graph):
+    def __init__(self, G: Graph):
         self.G = G
 
-    def add_edge(self, src: detect.ObjectDetection, dst: detect.ObjectDetection) -> None:
+    def add_edge(self, src: ObjectDetection, dst: ObjectDetection) -> None:
         """
 
         """
@@ -32,7 +32,7 @@ class SceneReconstructor:
         weight = dst.pt - src.pt
         self.G[src.id][dst.id] = weight
 
-    def add_frame(self, detections: List[detect.ObjectDetection]) -> None:
+    def add_frame(self, detections: List[ObjectDetection]) -> None:
         """
 
         """

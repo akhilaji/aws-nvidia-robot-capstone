@@ -37,17 +37,23 @@ class ObjectTracker:
 
     """
 
-    def track(self, detections: List[ObjectDetection]) -> None:
+    def __call__(self, detections: List[ObjectDetection]) -> None:
         """
 
         """
         pass
 
 class CentroidTracker:
-    class ObjectInstance(NamedTuple):
-        kfilter: cv2.KalmanFilter
-        detection: ObjectDetection = None
-        age: int = 0
+    class ObjectInstance:
+        def __init__(self,
+                kfilter: cv2.KalmanFilter,
+                detection: ObjectDetection = None,
+                age: int = 0,
+            ):
+            self.kfilter = kfilter
+            self.detection = detection
+            self.age = age
+
 
         def correct(self, measurement: Centroid) -> None:
             self.kfilter.correct(np.reshape(measurement, (2, 1)))
@@ -64,7 +70,7 @@ class CentroidTracker:
             kfilter_factory: Callable[[], cv2.KalmanFilter] = pos_kalman_filter,
             pruning_age: int = 50,
             dist_thresh: float = 100.0,
-        ):        
+        ):
         self.on_screen = on_screen
         self.off_screen = off_screen
         self.id_itr = id_itr

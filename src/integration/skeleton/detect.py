@@ -5,8 +5,10 @@
 import numpy as np
 from cv2 import cv2
 
-from typing import Any, Dict, Iterator, List, NamedTuple, Set, Tuple
+from typing import Any, Dict, Iterator, List, NamedTuple, Set, Tuple, TypeVar
 from nptyping import NDArray
+
+ID = TypeVar('ID')
 
 class BoundingBox(NamedTuple):
     """
@@ -23,9 +25,9 @@ class BoundingBox(NamedTuple):
     w: int
     h: int
 
-class ObjectDetection(NamedTuple):
+class ObjectDetection:
     """
-    NamedTuple class definition for detected object instances.
+    Class data object definition for detected object instances.
 
     Attributes:
         bbox (BoundingBox): NamedTuple class definition for bounding box
@@ -33,14 +35,20 @@ class ObjectDetection(NamedTuple):
         
         obj_class (str): The assigned object classification of this detection.
 
-        id (Any): The assigned id of this detection.
+        id (ID): The assigned id of this detection.
 
         pt (NDArray[3, float]): 
     """
-    id: Any
-    bbox: BoundingBox
-    obj_class: int
-    pt: NDArray[3, float]
+    def __init__(self,
+            id: ID,
+            bbox: BoundingBox,
+            obj_class: int,
+            pt: NDArray[3, float],
+        ):
+        self.id = id
+        self.bbox = bbox
+        self.obj_class = obj_class
+        self.pt = pt
 
 class ObjectDetector:
     """
