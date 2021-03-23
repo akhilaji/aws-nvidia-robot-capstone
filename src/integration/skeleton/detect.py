@@ -3,8 +3,9 @@
 """
 
 import numpy as np
+from cv2 import cv2
 
-from typing import Any, List, NamedTuple, Tuple
+from typing import Any, Dict, Iterator, List, NamedTuple, Set, Tuple
 from nptyping import NDArray
 
 class BoundingBox(NamedTuple):
@@ -36,9 +37,9 @@ class ObjectDetection(NamedTuple):
 
         pt (NDArray[3, float]): 
     """
-    bbox: BoundingBox
-    obj_class: str
     id: Any
+    bbox: BoundingBox
+    obj_class: int
     pt: NDArray[3, float]
 
 class ObjectDetector:
@@ -47,32 +48,12 @@ class ObjectDetector:
     Impelementation details to be specified by child.
     """
 
-    def __call__(self, np_rgb_img: NDArray[(Any, Any, 3), np.uint8]) -> List[ObjectDetection]:
+    def __call__(self,
+            frame: NDArray[(Any, Any, 3), np.uint8]
+        ) -> List[ObjectDetection]:
         """
         Runs object detection on a numpy 3-channel RGB image and formats the
         results as a list of ObjectDection containing the BoundingBox information
         and the detected object class.
-        """
-        pass
-
-class ObjectTracker:
-    """
-
-    """
-
-    def track(self, detections: List[ObjectDetection]) -> None:
-        """
-
-        """
-        pass
-
-class PointPicker:
-    """
-
-    """
-
-    def pick(self, detections: List[ObjectDetection]) -> None:
-        """
-
         """
         pass
