@@ -21,6 +21,7 @@ from core.config import cfg
 from core.yolov4 import filter_boxes
 from tensorflow.python.saved_model import tag_constants
 from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
 import depth
