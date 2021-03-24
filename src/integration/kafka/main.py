@@ -86,7 +86,7 @@ def get_object(_argv, data, config, session, input_size, images):
     allowed_classes = list(class_names.values())
 
     detections = []
-    for i in range(valid_detections):
+    for i in range(valid_detections[0]):
         bbox = BoundingBox(boxes[0][i][0],
                            boxes[0][i][1],
                            boxes[0][i][2],
