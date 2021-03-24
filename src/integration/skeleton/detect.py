@@ -32,22 +32,18 @@ class ObjectDetection:
     Attributes:
         bbox (BoundingBox): NamedTuple class definition for bounding box
             information. Contains attributes x, y, w, h in that order.
-        
         obj_class (str): The assigned object classification of this detection.
-
         id (ID): The assigned id of this detection.
-
-        pt (NDArray[3, float]): 
+        prob (float): The probability of the object detection.
+        pt (NDArray[3, float]):
     """
-    def __init__(self,
-            id: ID,
-            bbox: BoundingBox,
-            obj_class: int,
-            pt: NDArray[3, float],
-        ):
+    def __init__(self, id: ID, bbox: BoundingBox, obj_class: int, prob: float,
+                 pt: NDArray[3, float]):
+
         self.id = id
         self.bbox = bbox
         self.obj_class = obj_class
+        self.prob = prob
         self.pt = pt
 
 class ObjectDetector:
