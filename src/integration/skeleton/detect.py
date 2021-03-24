@@ -120,22 +120,21 @@ class ObjectDetector:
         allowed_classes = list(class_names.values())
 
         detections = []
-        #for i in range(valid_detections):
-        #    bbox = BoundingBox(boxes[0][i][0],
-        #                    boxes[0][i][1],
-        #                    boxes[0][i][2],
-        #                    boxes[0][i][3])
+        for i in range(valid_detections[0]):
+            bbox = BoundingBox(boxes[0][i][0],
+                            boxes[0][i][1],
+                            boxes[0][i][2],
+                            boxes[0][i][3])
 
-        #    obj = ObjectDetection(id=-1,
-        #                        bbox=bbox,
-        #                        obj_class=classes[0][i],
-        #                        prob=scores[0][i],
-        #                        pt=[-1,-1,-1])
+            obj = ObjectDetection(id=-1,
+                                bbox=bbox,
+                                obj_class=classes[0][i],
+                                prob=scores[0][i],
+                                pt=[-1,-1,-1])
 
-        #    detections.append(obj)
+            detections.append(obj)
 
-        #TODO
-        detections = []
+
         return detections
     
 def load_object_detector()-> ObjectDetector:
