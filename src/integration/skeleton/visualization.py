@@ -1,4 +1,4 @@
-from skeleton import detect
+from skeleton.detect import BoundingBox, ObjectDetection
 
 import cv2
 import matplotlib.pyplot as plt
@@ -16,7 +16,24 @@ def intensity_image(depth_map: NDArray[(Any, Any), float]):
     plt.ylabel('Y Pixel')
     plt.show()
 
-def draw_detection(rgb_img, detection: detect.ObjectDetection, color, font):
-    bbox, obj_class = detection
-    cv2.rectangle(rgb_img, (bbox.x, bbox.y), (bbox.x + bbox.w, bbox.y + bbox.h), color)
+# Visualization Tools Needed:
+#   predicted position of bounding box from object tracker
+#   
+
+def draw_detection(
+        img: NDArray[(Any, Any, 3), np.uint8],
+        det: ObjectDetection
+    ) -> NDArray[(Any, Any, 3), np.uint8]:
+    # TODO graphically display information from an ObjectDetection instance by
+    # using functions like cv2.putText, cv2.rectangle, cv2.line, etc.
+    pass
+
+def draw_edge(
+        img: NDArray[(Any, Any, 3), np.uint8],
+        node1: ObjectDetection,
+        node2: ObjectDetection
+    ) -> NDArray[(Any, Any, 3), np.uint8]:
+    weight = node2.pt - node1.pt
+    # TODO draw edge and weight information on an RGB image by
+    # using functions like cv2.putText, cv2.rectangle, cv2.line, etc.
     pass

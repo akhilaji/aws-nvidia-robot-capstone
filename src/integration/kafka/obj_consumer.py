@@ -29,14 +29,6 @@ topic = 'objOutput'
 obj_result_producer = KafkaProducer(bootstrap_servers=['localhost:9092'])
 
 
-flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
-flags.DEFINE_string('model', 'yolov4', 'yolov3 or yolov4')
-flags.DEFINE_list('images', './data/images/kite.jpg', 'path to input image')
-flags.DEFINE_string('output', './detections/', 'path to output folder')
-flags.DEFINE_float('iou', 0.45, 'iou threshold')
-flags.DEFINE_float('score', 0.25, 'score threshold')
-flags.DEFINE_boolean('dont_show', False, 'dont show image output')
-
 def main(_argv):
     config = ConfigProto()
     config.gpu_options.allow_growth = True
@@ -63,7 +55,8 @@ def main(_argv):
         #print("%s:%d%d: key=%s value=%s" %(msg.topic, msg.partition,
         #                                   msg.offset, msg.key,
         #                                   msg.value))
-
+        timestamp = msg.timestamp
+        print(timestamp)
         nparr = np.fromstring(msg.value, np.uint8)
         image_np = cv2.imdecode(nparr, 1)
 
@@ -95,7 +88,7 @@ def main(_argv):
             score_threshold=FLAGS.score
         )
         pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
-        print(pred_bbox)
+        #print(pred_bbox)
 
         # read in all class names from config
         class_names = utils.read_class_names(cfg.YOLO.CLASSES)

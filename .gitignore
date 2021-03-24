@@ -8,3 +8,7 @@ data/*
 *.out
 
 venv/
+
+src/integration/yolov4-608/
+
+src/integration/yolov4-obj_best.weights
