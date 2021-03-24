@@ -22,6 +22,8 @@ from typing import Any, Dict, Iterator, List, NamedTuple, Set, Tuple, TypeVar
 
 ID = TypeVar('ID')
 
+ID = TypeVar('ID')
+
 class BoundingBox(NamedTuple):
     """
     NamedTuple class definition for a bounding box inside of an image.
