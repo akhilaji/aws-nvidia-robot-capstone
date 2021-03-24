@@ -29,6 +29,8 @@ from skeleton import graph
 from skeleton import reconstruction
 from skeleton import visualization
 
+from skeleton.detect import BoundingBox
+from skeleton.detect import ObjectDetection
 
 flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
 flags.DEFINE_string('model', 'yolov4', 'yolov3 or yolov4')
@@ -76,8 +78,6 @@ def get_object(_argv, data, config, session, input_size, images):
         iou_threshold=iou,
         score_threshold=score
     )
-    pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(),
-                 valid_detections.numpy()]
 
     # read in all class names from config
     class_names = utils.read_class_names(cfg.YOLO.CLASSES)
@@ -85,12 +85,22 @@ def get_object(_argv, data, config, session, input_size, images):
     # by default allow all classes in .names file
     allowed_classes = list(class_names.values())
 
-    # custom allowed classes (uncomment line below to allow detections for only people)
-    #allowed_classes = ['person']
-    image = utils.draw_bbox(original_image, pred_bbox,
-                            allowed_classes=allowed_classes)
+    detections = []
+    for i in range(valid_detections):
+        bbox = BoundingBox(boxes[0][i][0],
+                           boxes[0][i][1],
+                           boxes[0][i][2],
+                           boxes[0][i][3])
 
-    return pred_bbox
+        obj = ObjectDetection(id=-1,
+                              bbox=bbox,
+                              obj_class=classes[0][i],
+                              prob=scores[0][i],
+                              pt=[-1,-1,-1])
+
+        detections.append(obj)
+
+    return detections
 
 def depth_visualization(depth_map, inv_depth_map, frame):
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
