@@ -8,8 +8,10 @@ from skeleton import reconstruction
 from skeleton import track
 from skeleton import visualization 
 
-import argparse
 import collections
+import itertools
+
+import argparse
 from cv2 import cv2
 import torch
 
@@ -58,7 +60,7 @@ def main(args: argparse.Namespace) -> None:
             ),
         ),
         object_tracker=track.CentroidTracker(
-            id_itr=iter(int, 1),
+            id_itr=itertools.count(start=0, step=1),
             pruning_age=50,
             dist_thresh=100.0,
         ),

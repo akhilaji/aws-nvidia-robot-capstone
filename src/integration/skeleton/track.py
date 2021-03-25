@@ -1,6 +1,7 @@
 from skeleton.detect import BoundingBox, ID, ObjectDetection
 
 import collections
+import itertools
 
 from cv2 import cv2
 import numpy as np
@@ -68,7 +69,7 @@ class CentroidTracker:
     def __init__(self,
             on_screen: Set[ID] = set(),
             off_screen: Set[ID] = set(),
-            id_itr: Iterator[ID] = iter(int, 1),
+            id_itr: Iterator[ID] = itertools.count(start=0, step=1),
             dist_f: Callable[[Centroid, Centroid], float] = centroid_distance,
             kfilter_factory: Callable[[], cv2.KalmanFilter] = pos_kalman_filter,
             pruning_age: int = 50,
