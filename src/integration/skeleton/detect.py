@@ -107,8 +107,8 @@ class YOLOv4ObjectDetector(ObjectDetector):
     def __call__(self, frame: NDArray[(Any, Any, 3), np.float32]) -> List[ObjectDetection]:
         frame = cv2.resize(frame, self.input_dim)
         batch_data = tf.constant(np.array([frame], np.float32))
-        serving_default = self.model.signatures['serving_default']
-        pred_bbox = serving_default(batch_data)
+        model_signature = self.model.signatures['serving_default']
+        pred_bbox = model_signature(batch_data)
         for value in pred_bbox.values():
             boxes = value[:, :, 0:4]
             pred_conf = value[:, :, 4:]
