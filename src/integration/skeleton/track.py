@@ -34,16 +34,20 @@ def pos_kalman_filter(p_noise_cov_scale: float = 0.03) -> cv2.KalmanFilter:
 
 class ObjectTracker:
     """
-
+    Abstract callable object to run object tracking on the detected object
+    instances found in sequential frames from a video feed. Does this by
+    assigning an id to each detected object instance. Implementation details to
+    be specified by implementation sof this interface.
     """
 
     def __call__(self, detections: List[ObjectDetection]) -> None:
         """
-
+        Assigns ids to each of the detected object instances.
         """
         pass
 
 class CentroidTracker:
+
     class ObjectInstance:
         def __init__(self,
                 kfilter: cv2.KalmanFilter,
@@ -53,7 +57,6 @@ class CentroidTracker:
             self.kfilter = kfilter
             self.detection = detection
             self.age = age
-
 
         def correct(self, measurement: Centroid) -> None:
             self.kfilter.correct(np.reshape(measurement, (2, 1)))
@@ -113,6 +116,8 @@ class CentroidTracker:
             else:
                 assign_id(o_id, det)
                 self.off_screen.remove(o_id)
+        for det in filter(lambda x: x.id == None, detections):
+            assign_id(next(self.id_itr), det)
         for o_id, o_inst in self.obj_instance.items():
             if o_inst.age > self.pruning_age:
                 del self.obj_instance[o_id]

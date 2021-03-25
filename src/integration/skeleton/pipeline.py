@@ -27,10 +27,9 @@ class DetectionPipeline:
 
     def __call__(self,
             frame: NDArray[(Any, Any, 3), np.uint8],
-            intr
         ) -> List[ObjectDetection]:
         detections = self.object_detector(frame)
         depth_map = self.depth_estimator(frame)
         self.object_tracker(detections)
-        self.point_picker(detections, frame, depth_map, intr)
+        # self.point_picker(detections, frame, depth_map)
         return detections

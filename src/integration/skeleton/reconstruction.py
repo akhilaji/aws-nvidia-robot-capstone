@@ -7,22 +7,27 @@
 }
 """
 
-from skeleton.detect import ObjectDetection
+from skeleton.detect import ID, ObjectDetection
 from skeleton.graph import Graph
 
 import numpy as np
 import open3d
 
-from typing import Any, List
+from typing import Any, Dict, List
 from nptyping import NDArray
+
+class Scene:
+    def __init__(self, G: Graph, obj_class: Dict[ID, int]):
+        self.G = G
+        self.obj_class = obj_class
 
 class SceneReconstructor:
     """
 
     """
 
-    def __init__(self, G: Graph):
-        self.G = G
+    def __init__(self, scene: Scene):
+        self.scene = scene
 
     def add_edge(self, src: ObjectDetection, dst: ObjectDetection) -> None:
         """
@@ -30,22 +35,23 @@ class SceneReconstructor:
         """
         # TODO add filter
         weight = dst.pt - src.pt
-        self.G[src.id][dst.id] = weight
+        self.scene.G[src.id][dst.id] = weight
 
     def add_frame(self, detections: List[ObjectDetection]) -> None:
         """
 
         """
         for i in range(len(detections)):
+            self.scene.obj_class[detections[i].id] = detections[i].obj_class
             for j in range(i + 1, len(detections)):
                 self.add_edge(detections[i], detections[j])
                 self.add_edge(detections[j], detections[i])
 
-    def finalize(self):
+    def finalize(self) -> Scene:
         """
 
         """
-        pass
+        return self.scene
 
 def np_to_o3d_rgb_image(
         np_rgb_image: NDArray[(Any, Any, 3), np.uint8]
