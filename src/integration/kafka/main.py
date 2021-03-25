@@ -10,6 +10,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 
+import numbers
+
 import tensorflow as tf
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -88,17 +90,40 @@ def get_object(_argv, data, config, session, input_size, images):
 
     detections = []
     for i in range(valid_detections[0]):
-        bbox = BoundingBox(boxes[0][i][0],
-                           boxes[0][i][1],
-                           boxes[0][i][2],
-                           boxes[0][i][3])
+        x = (boxes[0][i][0]).numpy()
+        y = (boxes[0][i][1]).numpy()
+        w = (boxes[0][i][2]).numpy()
+        h = (boxes[0][i][3]).numpy()
+
+        if x == np.inf or not isinstance(x, numbers.Number):
+            x = 0.5
+        if y == np.inf or not isinstance(y, numbers.Number):
+            y = 0.5
+        if w == np.inf or not isinstance(w, numbers.Number):
+            w = 0.5
+        if h == np.inf or not isinstance(h, numbers.Number):
+            h = 0.5
+
+        if x > 1:
+            x = 1
+        if y > 1:
+            y = 1
+        if w > 1:
+            w = 1
+        if h > 1:
+            h = 1
+            
+
+        bbox = BoundingBox(x, y, x + w, y + h)
+
+        print(bbox)
 
         obj = ObjectDetection(id=-1,
                               bbox=bbox,
-                              obj_class=classes[0][i],
-                              prob=scores[0][i],
+                              obj_class=(classes[0][i]).numpy(),
+                              prob=(scores[0][i]).numpy(),
                               pt=[-1,-1,-1])
-
+        print(obj)
         detections.append(obj)
 
     return detections
@@ -118,7 +143,7 @@ def main(_argv):
     print("initializing services")
     # Video Settings
     # set 0 for camera
-    video_src = 0
+    video_src = '../../data/videos/demo.mp4'
     resolution_width = 608
     resolution_height = 608
     dim = (resolution_width, resolution_height)
@@ -134,7 +159,7 @@ def main(_argv):
     input_size = 608
     images = FLAGS.images
 
-    MidasEstimator = depth.construct_midas_large()
+    #MidasEstimator = depth.construct_midas_large()
     
     while video.isOpened():
         frame_time = datetime.datetime.now()
@@ -144,7 +169,7 @@ def main(_argv):
         frame = cv2.resize(frame, dim)
 
         executor = ThreadPoolExecutor(max_workers=2)
-        depth_value = executor.submit(get_depth(MidasEstimator,frame))
+        #depth_value = executor.submit(get_depth(MidasEstimator,frame))
         objects = executor.submit(get_object(_argv, frame, config, session, input_size, images))
 
         #Calculate the depth map
