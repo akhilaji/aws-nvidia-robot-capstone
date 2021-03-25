@@ -67,7 +67,8 @@ class ObjectDetection:
         self.pt = pt
     
     def __str__(self) -> str:
-        return 'id=%r,bbox=%r,obj_class=%r,prob=%r,pt=%r' % (self.id, self.bbox, self.obj_class, self.prob, self.pt)
+        return 'id=%r\nbbox=%r\nobj_class=%r\nprob=%r\npt=%r' % (self.id, self.bbox, self.obj_class, self.prob, self.pt)
+        # return 'id=%r' % (self.id)
     
     def __repr__(self) -> str:
         return self.__str__()
@@ -109,6 +110,7 @@ class YOLOv4ObjectDetector(ObjectDetector):
         batch_data = tf.constant(np.array([frame], np.float32))
         model_signature = self.model.signatures['serving_default']
         pred_bbox = model_signature(batch_data)
+        print(pred_bbox)
         for value in pred_bbox.values():
             boxes = value[:, :, 0:4]
             pred_conf = value[:, :, 4:]

@@ -8,7 +8,6 @@ import numpy as np
 from nptyping import NDArray
 from typing import Any, List
 
-
 class DetectionPipeline:
     """
 

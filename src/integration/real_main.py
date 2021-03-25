@@ -29,15 +29,13 @@ def construct_scene_graph(
         cap: cv2.VideoCapture,
         detection_pipeline: pipeline.DetectionPipeline,
         scene_reconstructor: reconstruction.SceneReconstructor,
-    ) -> graph.Graph:
+    ):
     frame = None
     while cap.grab():
         frame = cap.retrieve(frame)
         detections = detection_pipeline(frame)
         scene_reconstructor.add_frame(detections)
     return scene_reconstructor.finalize()
-
-
 
 def main(args: argparse.Namespace) -> None:
     detection_pipeline = pipeline.DetectionPipeline(
@@ -69,7 +67,9 @@ def main(args: argparse.Namespace) -> None:
     read_img = lambda fname: cv2.cvtColor(cv2.imread(fname), cv2.COLOR_BGR2RGB)
     img = read_img('20181031205142-shutterstock-1031148421-crop.jpeg')
     detections = detection_pipeline(img)
-    print('real_main.py - 70:', detections)
+    for det in detections:
+        print('\t' + '\n\t'.join(str(det).split('\n')), '\n')
+    # print('real_main.py - 70:', detections)
     return None
 
 if __name__ == '__main__':
