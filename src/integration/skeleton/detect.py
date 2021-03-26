@@ -2,6 +2,8 @@
 
 """
 
+import numbers
+
 from cv2 import cv2
 import numpy as np
 import tensorflow as tf
@@ -78,7 +80,7 @@ class ObjectDetector:
     Abstract callable object to run object detection on an RGB image.
     Impelementation details to be specified by child.
     """
-        
+
     def __call__(self, frame) -> List[ObjectDetection]:
         """
         Runs object detection on a numpy 3-channel RGB image and formats the
@@ -106,8 +108,8 @@ class YOLOv4ObjectDetector(ObjectDetector):
         self.score_threshold = score_threshold
     
     def __call__(self, frame: NDArray[(Any, Any, 3), np.float32]) -> List[ObjectDetection]:
-        frame = cv2.resize(frame, self.input_dim)
-        batch_data = tf.constant(np.array([frame], np.float32))
+        resized_frame = cv2.resize(frame, self.input_dim)
+        batch_data = tf.constant(np.array([resized_frame], np.float32))
         model_signature = self.model.signatures['serving_default']
         pred_bbox = model_signature(batch_data)
         print(pred_bbox)
@@ -122,16 +124,48 @@ class YOLOv4ObjectDetector(ObjectDetector):
             iou_threshold=self.iou_threshold,
             score_threshold=self.score_threshold,
         )
+        src_h, src_w, _ = frame.shape
+        input_w, input_h = self.input_dim
+        x_ratio = src_w
+        y_ratio = src_h
+        print('src_w=', src_w)
+        print('src_h=', src_h)
+        print('input_w=', input_w)
+        print('input_h=', input_h)
         return [
             ObjectDetection(
                 id=None,
-                bbox=BoundingBox(*boxes[0][i]),
-                obj_class=classes[0][i],
-                prob=scores[0][i],
+                bbox=convert_bbox(boxes[0][i], x_ratio, y_ratio),
+                obj_class=int(classes[0][i].numpy()),
+                prob=scores[0][i].numpy(),
                 pt=None,
             )
             for i in range(valid_detections[0])
         ]
+
+def convert_bbox(boxes: tf.Tensor, x_ratio: int, y_ratio: float) -> BoundingBox:
+    def normalize(val: float) -> float:
+        if val == np.inf or not isinstance(x, numbers.Number):
+            return 0.5
+        elif val > 1.0:
+            return 1.0
+        else:
+            return val
+    x, y, w, h = boxes.numpy()
+    # return BoundingBox(
+    #     x=int(normalize(x) * x_ratio),
+    #     y=int(normalize(y) * y_ratio),
+    #     w=int(normalize(w) * x_ratio),
+    #     h=int(normalize(h) * y_ratio),
+    # )
+    bbox = BoundingBox(
+        x=int(normalize(x) * x_ratio),
+        y=int(normalize(y) * y_ratio),
+        w=int(normalize(w) * x_ratio),
+        h=int(normalize(h) * y_ratio),
+    )
+    print(bbox)
+    return bbox
 
 def construct_yolov4_object_detector(
         model_path: str,
