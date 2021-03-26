@@ -37,14 +37,14 @@ def construct_scene_graph(
         scene_reconstructor.add_frame(detections)
     return scene_reconstructor.finalize()
 
-def main(args: argparse.Namespace) -> None:
-    detection_pipeline = pipeline.DetectionPipeline(
+def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.DetectionPipeline:
+    return pipeline.DetectionPipeline(
         object_detector=detect.construct_yolov4_object_detector(
             model_path=args.model_path,
             input_dim=(args.input_w, args.input_h),
         ),
         depth_estimator=depth.construct_midas_large(
-            device=torch.device('cuda'),
+            device=torch.device(args.depth_device),
         ),
         point_picker=pick.AverageContourPointPicker(
             camera=calibration.Camera(
@@ -64,12 +64,25 @@ def main(args: argparse.Namespace) -> None:
         ),
     )
 
-    read_img = lambda fname: cv2.cvtColor(cv2.imread(fname), cv2.COLOR_BGR2RGB)
-    img = read_img('20181031205142-shutterstock-1031148421-crop.jpeg')
-    detections = detection_pipeline(img)
+def main(args: argparse.Namespace) -> None:
+    detection_pipeline = construct_detection_pipeline(args)
+
+    filename = '20181031205142-shutterstock-1031148421-crop.jpeg'
+    bgr_img = cv2.imread(filename)
+    rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+    detections = detection_pipeline(rgb_img)
     for det in detections:
-        print('\t' + '\n\t'.join(str(det).split('\n')), '\n')
-    # print('real_main.py - 70:', detections)
+        visualization.draw_detection(
+            bgr_img,
+            det,
+            [255,0,200],
+            cv2.FONT_HERSHEY_PLAIN,
+            1.0,
+        )
+        print(det)
+    resized = cv2.resize(bgr_img, (1920, 1080))
+    cv2.imshow(filename, resized)
+    cv2.waitKey(0)
     return None
 
 if __name__ == '__main__':
@@ -77,4 +90,5 @@ if __name__ == '__main__':
     arg_parser.add_argument('--model_path', type=str, default='./yolov4-608/')
     arg_parser.add_argument('--input_w', type=int, default=608)
     arg_parser.add_argument('--input_h', type=int, default=608)
+    arg_parser.add_argument('--depth_device', type=str, default='cuda')
     main(arg_parser.parse_args())
