@@ -13,9 +13,9 @@ from core.config import cfg
 class Dataset(object):
     """implement Dataset here"""
 
-    def __init__(self, FLAGS, is_training: bool, dataset_type: str = "converted_coco"):
-        self.tiny = FLAGS.tiny
-        self.strides, self.anchors, NUM_CLASS, XYSCALE = utils.load_config(FLAGS)
+    def __init__(self, is_training: bool, dataset_type: str = "converted_coco"):
+        self.tiny = False
+        self.strides, self.anchors, NUM_CLASS, XYSCALE = utils.load_config()
         self.dataset_type = dataset_type
 
         self.annot_path = (
@@ -286,7 +286,6 @@ class Dataset(object):
         )
         return image, bboxes
 
-
     def preprocess_true_boxes(self, bboxes):
         label = [
             np.zeros(
@@ -299,7 +298,8 @@ class Dataset(object):
             )
             for i in range(3)
         ]
-        bboxes_xywh = [np.zeros((self.max_bbox_per_scale, 4)) for _ in range(3)]
+        bboxes_xywh = [np.zeros((self.max_bbox_per_scale, 4))
+                       for _ in range(3)]
         bbox_count = np.zeros((3,))
 
         for bbox in bboxes:
