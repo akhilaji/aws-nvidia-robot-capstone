@@ -76,7 +76,9 @@ def main(_argv):
         objects = Detector(frame)
 
         #print(depth_value)
-        print(objects)
+        for i in objects:
+            print(i.id)
+            print(i.obj_class)
         print(frame_time)
 
 

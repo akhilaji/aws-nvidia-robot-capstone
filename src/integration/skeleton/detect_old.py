@@ -123,21 +123,44 @@ class ObjectDetector:
 
         image = utils.draw_bbox(frame, pred_bbox_original, allowed_classes=allowed_classes)
         image = Image.fromarray(image.astype(np.uint8))
-        image.show()
-        
+        #image.show()
+
         detections = []
         for i in range(valid_detections[0]):
-            bbox = BoundingBox(boxes[0][i][0],
-                            boxes[0][i][1],
-                            boxes[0][i][2],
-                            boxes[0][i][3])
+            x = (boxes[0][i][0]).numpy()
+            y = (boxes[0][i][1]).numpy()
+            w = (boxes[0][i][2]).numpy()
+            h = (boxes[0][i][3]).numpy()
+
+            if x == np.inf or not isinstance(x, numbers.Number):
+                x = 0.5
+            if y == np.inf or not isinstance(y, numbers.Number):
+                y = 0.5
+            if w == np.inf or not isinstance(w, numbers.Number):
+                w = 0.5
+            if h == np.inf or not isinstance(h, numbers.Number):
+                h = 0.5
+
+            if x > 1:
+                x = 1
+            if y > 1:
+                y = 1
+            if w > 1:
+                w = 1
+            if h > 1:
+                h = 1
+                
+
+            bbox = BoundingBox(x, y, x + w, y + h)
+
+            print(bbox)
 
             obj = ObjectDetection(id=-1,
                                 bbox=bbox,
-                                obj_class=classes[0][i],
-                                prob=scores[0][i],
+                                obj_class=(classes[0][i]).numpy(),
+                                prob=(scores[0][i]).numpy(),
                                 pt=[-1,-1,-1])
-
+            print(obj)
             detections.append(obj)
 
 
