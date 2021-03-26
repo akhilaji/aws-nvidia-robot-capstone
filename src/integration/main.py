@@ -9,11 +9,17 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
+
+from skeleton import calibration
 from skeleton import depth
 from skeleton import detect
+from skeleton import detect_old
 from skeleton import graph
+from skeleton import pick
+from skeleton import pipeline
 from skeleton import reconstruction
-from skeleton import visualization
+from skeleton import track
+from skeleton import visualization 
 
 from absl import app, flags, logging
 from absl.flags import FLAGS
@@ -49,7 +55,7 @@ def main(_argv):
     video.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
     MidasEstimator = depth.construct_midas_large()
-    Detector = detect.load_object_detector()
+    Detector = detect_old.load_object_detector()
     
     
     while video.isOpened():

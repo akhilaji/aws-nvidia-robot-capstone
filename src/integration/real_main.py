@@ -67,7 +67,7 @@ def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.Detection
 def main(args: argparse.Namespace) -> None:
     detection_pipeline = construct_detection_pipeline(args)
 
-    filename = '20181031205142-shutterstock-1031148421-crop.jpeg'
+    filename = 'test.png'
     bgr_img = cv2.imread(filename)
     rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
     detections = detection_pipeline(rgb_img)
