@@ -33,15 +33,15 @@ class BoundingBox(NamedTuple):
     NamedTuple class definition for a bounding box inside of an image.
 
     Attributes:
-        x (int): the x-coordinate position of the bounding box
-        y (int): the y-coordinate position of the bounding box
-        w (int): the width of the bounding box
-        h (int); the height of the bounding box
+        x1 (int): the left-most x-coordinate position of the bounding box
+        y1 (int): the top-most y-coordinate position of the bounding box
+        x2 (int): the right-most x-coordinate position of the bounding box
+        y2 (int); the bottom-most y-coordinate position of the bounding box
     """
-    x: int
-    y: int
-    w: int
-    h: int
+    x1: int
+    y1: int
+    x2: int
+    y2: int
 
 class ObjectDetection:
     """
@@ -146,10 +146,10 @@ def convert_bbox(boxes: tf.Tensor, x_ratio: int, y_ratio: float) -> BoundingBox:
     coor = boxes.numpy()
 
     return BoundingBox(
-        x=int(coor[1] * x_ratio),
-        y=int(coor[0] * y_ratio),
-        w=int(coor[3] * x_ratio),
-        h=int(coor[2] * y_ratio),
+        x1=int(coor[1] * x_ratio),
+        y1=int(coor[0] * y_ratio),
+        x2=int(coor[3] * x_ratio),
+        y2=int(coor[2] * y_ratio),
     )
 
 def construct_yolov4_object_detector(

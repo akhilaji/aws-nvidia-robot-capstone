@@ -36,7 +36,7 @@ def draw_detection(
     # using functions like cv2.putText, cv2.rectangle, cv2.line, etc.
     text = 'id=%r, class=%s, prob=%r' % (det.id, (list(utils.read_class_names(cfg.YOLO.CLASSES).values()))[det.obj_class], det.prob)
     draw_bbox(img, det.bbox, color, thickness, line_type)
-    draw_text(img, text, (det.bbox.x, det.bbox.y), font_face, font_scale, color, thickness, line_type)
+    draw_text(img, text, (det.bbox.x1, det.bbox.y1), font_face, font_scale, color, thickness, line_type)
 
 def draw_edge(
         img: NDArray[(Any, Any, 3), np.uint8],
@@ -57,8 +57,8 @@ def draw_bbox(
     ) -> None:
     cv2.rectangle(
         img,
-        (bbox.x, bbox.y),
-        (bbox.w, bbox.h),
+        (bbox.x1, bbox.y1),
+        (bbox.x2, bbox.y2),
         color,
         thickness=thickness,
         lineType=line_type,

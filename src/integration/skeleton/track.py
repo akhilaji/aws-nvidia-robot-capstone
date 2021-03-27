@@ -12,7 +12,7 @@ from nptyping import NDArray
 Centroid = NDArray[2, np.float32]
 
 def centroid(bbox: BoundingBox) -> Centroid:
-    return np.array([bbox.w / 2.0 + bbox.x, bbox.h / 2.0 + bbox.y], np.float32)
+    return np.array([(bbox.x2 - bbox.x1) / 2.0 + bbox.x1, (bbox.y2 - bbox.y1) / 2.0 + bbox.y1], np.float32)
 
 def centroid_distance(c1: Centroid, c2: Centroid) -> float:
     return (c2[1] - c1[1]) ** 2.0 + (c2[0] - c1[0]) ** 2.0
