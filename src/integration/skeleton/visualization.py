@@ -1,5 +1,8 @@
 from skeleton.detect import BoundingBox, ObjectDetection
 
+from core import utils
+from core.config import cfg
+
 from cv2 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,7 +34,7 @@ def draw_detection(
     ) -> None:
     # TODO graphically display information from an ObjectDetection instance by
     # using functions like cv2.putText, cv2.rectangle, cv2.line, etc.
-    text = 'id=%r, class=%r, prob=%r' % (det.id, det.bbox, det.prob)
+    text = 'id=%r, class=%s, prob=%r' % (det.id, (list(utils.read_class_names(cfg.YOLO.CLASSES).values()))[det.obj_class], det.prob)
     draw_bbox(img, det.bbox, color, thickness, line_type)
     draw_text(img, text, (det.bbox.x, det.bbox.y), font_face, font_scale, color, thickness, line_type)
 
@@ -55,7 +58,7 @@ def draw_bbox(
     cv2.rectangle(
         img,
         (bbox.x, bbox.y),
-        (bbox.x + bbox.w, bbox.y + bbox.h),
+        (bbox.w, bbox.h),
         color,
         thickness=thickness,
         lineType=line_type,
