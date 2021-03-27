@@ -66,15 +66,14 @@ class ObjectDetector:
     Abstract callable object to run object detection on an RGB image.
     Impelementation details to be specified by child.
     """
-    def __init__(self, model_path , saved_model_loaded, config, session, input_size, images):
+    def __init__(self, model_path , saved_model_loaded, config, session, input_size):
         self.model_path = model_path
         self.saved_model_loaded = saved_model_loaded
         self.config = config
         self.config.gpu_options.allow_growth = True
         self.session = session
-        STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config(FLAGS)
+        STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config()
         self.input_size = input_size
-        self.images = images
 
         
     def __call__(self, frame) -> List[ObjectDetection]:
@@ -123,7 +122,7 @@ class ObjectDetector:
 
         image = utils.draw_bbox(frame, pred_bbox_original, allowed_classes=allowed_classes)
         image = Image.fromarray(image.astype(np.uint8))
-        #image.show()
+        image.show()
 
         detections = []
         for i in range(valid_detections[0]):
@@ -167,10 +166,6 @@ class ObjectDetector:
         return detections
     
 def load_object_detector()-> ObjectDetector:
-    flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
-    flags.DEFINE_string('model', 'yolov4', 'yolov3 or yolov4')
-    flags.DEFINE_list('images', './data/images/kite.jpg', 'path to input image')
-    flags.DEFINE_string('output', './detections/', 'path to output folder')
     # load model
     model_path = "./yolov4-608"
     saved_model_loaded = tf.saved_model.load(
@@ -179,7 +174,6 @@ def load_object_detector()-> ObjectDetector:
     config = ConfigProto()
     config.gpu_options.allow_growth = True
     session = InteractiveSession(config=config)
-    STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config(FLAGS)
+    STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config()
     input_size = 608
-    images = FLAGS.images
-    return ObjectDetector(model_path, saved_model_loaded, config, session, input_size, images)
+    return ObjectDetector(model_path, saved_model_loaded, config, session, input_size)

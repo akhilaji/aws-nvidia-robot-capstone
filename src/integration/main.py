@@ -56,6 +56,7 @@ def main(_argv):
 
     MidasEstimator = depth.construct_midas_large()
     Detector = detect_old.load_object_detector()
+    UpdatedDetector = detect.construct_yolov4_object_detector("./yolov4-608", dim)
     
     
     while video.isOpened():
@@ -73,7 +74,8 @@ def main(_argv):
         #depth_value = get_depth(MidasEstimator,frame)
         #depth_map = 1.0/depth_value
         #depth_visualization(depth_map, depth_value, frame)
-        objects = Detector(frame)
+        #objects = Detector(frame)
+        objects = UpdatedDetector(frame)
 
         #print(depth_value)
         for i in objects:

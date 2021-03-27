@@ -95,6 +95,8 @@ class YOLOv4ObjectDetector(ObjectDetector):
             model,
             session,
             input_dim: Tuple[int, int],
+            input_size,
+            config,
             max_output_size_per_class: int = 50,
             max_total_size: int = 50,
             iou_threshold: float = 0.45,
@@ -103,10 +105,13 @@ class YOLOv4ObjectDetector(ObjectDetector):
         self.model = model
         self.session = session
         self.input_dim = input_dim
+        self.input_size = input_size
+        self.config = config
         self.max_output_size_per_class = max_output_size_per_class
         self.max_total_size = max_total_size
         self.iou_threshold = iou_threshold
         self.score_threshold = score_threshold
+        STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config()
     
     def __call__(self, frame: NDArray[(Any, Any, 3), np.float32]) -> List[ObjectDetection]:
         resized_frame = cv2.resize(frame, self.input_dim)
@@ -133,7 +138,7 @@ class YOLOv4ObjectDetector(ObjectDetector):
         allowed_classes = list(class_names.values())
 
         image = utils.draw_bbox(frame, pred_bbox, allowed_classes=allowed_classes)
-        image = Image.fromarray(image.astype(uint8))
+        image = Image.fromarray(image.astype(np.uint8))
         image.show()
 
         src_h, src_w, _ = frame.shape
@@ -191,14 +196,19 @@ def construct_yolov4_object_detector(
     config = ConfigProto()
     config.gpu_options.allow_growth = True
     session = InteractiveSession(config=config)
+    STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config()
+    input_size = 608
     return YOLOv4ObjectDetector(
         model,
         session,
         input_dim,
+        input_size,
+        config,
         max_output_size_per_class=max_output_size_per_class,
         max_total_size=max_total_size,
         iou_threshold=iou_threshold,
         score_threshold=score_threshold,
+
     )
 
 """
