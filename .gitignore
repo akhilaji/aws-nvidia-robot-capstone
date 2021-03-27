@@ -8,6 +8,8 @@ data/*
 *.out
 
 venv/
-
 yolov4-608/
+
+# Temporary files
 __pycache__/
+*.pyc
