@@ -125,16 +125,6 @@ class YOLOv4ObjectDetector(ObjectDetector):
             score_threshold=self.score_threshold,
         )
 
-
-        # test yolov4-tf draw_bbox function
-        pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
-        class_names = utils.read_class_names(cfg.YOLO.CLASSES)
-        allowed_classes = list(class_names.values())
-
-        image = utils.draw_bbox(frame, pred_bbox, allowed_classes=allowed_classes)
-        image = Image.fromarray(image.astype(uint8))
-        image.show()
-
         src_h, src_w, _ = frame.shape
         input_w, input_h = self.input_dim
         x_ratio = src_w
