@@ -67,7 +67,7 @@ def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.Detection
 def main(args: argparse.Namespace) -> None:
     detection_pipeline = construct_detection_pipeline(args)
 
-    filename = '20181031205142-shutterstock-1031148421-crop.jpeg'
+    filename = args.first_image    
     bgr_img = cv2.imread(filename)
     rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
     detections = detection_pipeline(rgb_img)
@@ -91,7 +91,12 @@ if __name__ == '__main__':
     arg_parser.add_argument('--input-w',      type=int, default=608)
     arg_parser.add_argument('--input-h',      type=int, default=608)
     arg_parser.add_argument('--depth-device', type=str, default='cuda')
-    arg_parser.add_argument('--first-image',  type=str, default='')
-    arg_parser.add_argument('--second-image', type=str, default='')
-
+    arg_parser.add_argument('--first-image',  type=str, default=None)
+    arg_parser.add_argument('--second-image', type=str, default=None)
+    args = arg_parser.parse_args()
+    
+    # argument error checks
+    if args.first_image is None:
+        raise ValueError('Expected a first image (Hint: Use --first-image)')
+    
     main(arg_parser.parse_args())
