@@ -67,20 +67,22 @@ def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.Detection
 def main(args: argparse.Namespace) -> None:
     detection_pipeline = construct_detection_pipeline(args)
 
-    filename = args.first_image    
+    filename = args.first_image
     bgr_img = cv2.imread(filename)
     rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+    resized = cv2.resize(bgr_img, (608,608))
+
     detections = detection_pipeline(rgb_img)
+    
     for det in detections:
         visualization.draw_detection(
-            bgr_img,
+            resized,
             det,
             [255,0,200],
             cv2.FONT_HERSHEY_PLAIN,
             1.0,
         )
-        print(det)
-    resized = cv2.resize(bgr_img, (1920, 1080))
+
     cv2.imshow(filename, resized)
     cv2.waitKey(0)
     return None
