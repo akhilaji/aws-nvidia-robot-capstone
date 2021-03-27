@@ -87,8 +87,11 @@ def main(args: argparse.Namespace) -> None:
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--model-path', type=str, default='./yolov4-608/')
-    arg_parser.add_argument('--input-w', type=int, default=608)
-    arg_parser.add_argument('--input-h', type=int, default=608)
+    arg_parser.add_argument('--model-path',   type=str, default='./yolov4-608/')
+    arg_parser.add_argument('--input-w',      type=int, default=608)
+    arg_parser.add_argument('--input-h',      type=int, default=608)
     arg_parser.add_argument('--depth-device', type=str, default='cuda')
+    arg_parser.add_argument('--first-image',  type=str, default='')
+    arg_parser.add_argument('--second-image', type=str, default='')
+
     main(arg_parser.parse_args())
