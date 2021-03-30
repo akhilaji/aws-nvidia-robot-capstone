@@ -7,7 +7,7 @@ from cv2 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from typing import Any, Tuple
+from typing import Any, List, Tuple
 from nptyping import NDArray
 
 def intensity_image(depth_map: NDArray[(Any, Any), float]):
@@ -32,11 +32,29 @@ def draw_detection(
         thickness: int = 1,
         line_type: int = cv2.LINE_8,
     ) -> None:
-    # TODO graphically display information from an ObjectDetection instance by
-    # using functions like cv2.putText, cv2.rectangle, cv2.line, etc.
     text = 'id=%r, class=%s, prob=%r' % (det.id, (list(utils.read_class_names(cfg.YOLO.CLASSES).values()))[det.obj_class], det.prob)
     draw_bbox(img, det.bbox, color, thickness, line_type)
-    draw_text(img, text, (det.bbox.x1, det.bbox.y1), font_face, font_scale, color, thickness, line_type)
+    draw_text(img, text, (det.bbox.x, det.bbox.y), font_face, font_scale, color, thickness, line_type)
+
+def draw_all_detections(
+        img: NDArray[(Any, Any, 3), np.uint8],
+        detections: List[ObjectDetection],
+        color: NDArray[3, np.uint8],
+        font_face: int,
+        font_scale: float,
+        thickness: int = 1,
+        line_type: int = cv2.LINE_8,
+    ) -> None:
+    for det in detections:
+        draw_detection(
+            img=img,
+            det=det,
+            color=color,
+            font_face=font_face,
+            font_scale=font_scale,
+            thickness=thickness,
+            line_type=line_type,
+        )
 
 def draw_edge(
         img: NDArray[(Any, Any, 3), np.uint8],
@@ -57,8 +75,8 @@ def draw_bbox(
     ) -> None:
     cv2.rectangle(
         img,
-        (bbox.x1, bbox.y1),
-        (bbox.x2, bbox.y2),
+        (bbox.x, bbox.y),
+        (bbox.x + bbox.w, bbox.y + bbox.h),
         color,
         thickness=thickness,
         lineType=line_type,

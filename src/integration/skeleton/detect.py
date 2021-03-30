@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 
 import tensorflow as tf
+
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -34,15 +35,15 @@ class BoundingBox(NamedTuple):
     NamedTuple class definition for a bounding box inside of an image.
 
     Attributes:
-        x1 (int): the left-most x-coordinate position of the bounding box
-        y1 (int): the top-most y-coordinate position of the bounding box
-        x2 (int): the right-most x-coordinate position of the bounding box
-        y2 (int); the bottom-most y-coordinate position of the bounding box
+        x (int): the left-most x-coordinate position of the bounding box
+        y (int): the top-most y-coordinate position of the bounding box
+        w (int): the width of the bounding box
+        h (int); the bottom-most y-coordinate position of the bounding box
     """
-    x1: int
-    y1: int
-    x2: int
-    y2: int
+    x: int
+    y: int
+    w: int
+    h: int
 
 class ObjectDetection:
     """
@@ -110,8 +111,7 @@ class YOLOv4ObjectDetector(ObjectDetector):
         self.score_threshold = score_threshold
     
     def __call__(self, frame: NDArray[(Any, Any, 3), np.float32]) -> List[ObjectDetection]:
-        resized_frame = cv2.resize(frame, self.input_dim)
-        batch_data = tf.constant(np.array([resized_frame / 255], np.float32))
+        batch_data = tf.constant(np.array([cv2.resize(frame, self.input_dim) / 255], np.float32))
         model_signature = self.model.signatures['serving_default']
         pred_bbox = model_signature(batch_data)
 
@@ -128,14 +128,11 @@ class YOLOv4ObjectDetector(ObjectDetector):
             score_threshold=self.score_threshold,
         )
 
-        input_w, input_h = self.input_dim
-        x_ratio = input_w
-        y_ratio = input_h
-
+        frame_h, frame_w, no_channels = frame.shape
         return [
             ObjectDetection(
                 id=None,
-                bbox=convert_bbox(boxes[0][i], x_ratio, y_ratio),
+                bbox=convert_bbox(boxes[0][i], frame_w, frame_h),
                 obj_class=int(classes[0][i].numpy()),
                 prob=scores[0][i].numpy(),
                 pt=None,
@@ -143,14 +140,17 @@ class YOLOv4ObjectDetector(ObjectDetector):
             for i in range(valid_detections[0])
         ]
 
-def convert_bbox(boxes: tf.Tensor, x_ratio: int, y_ratio: float) -> BoundingBox:
-    coor = boxes.numpy()
-
+def convert_bbox(box: tf.Tensor, x_ratio: int, y_ratio: float) -> BoundingBox:
+    y1, x1, y2, x2 = box.numpy()
+    x1 = int(x1 * x_ratio)
+    y1 = int(y1 * y_ratio)
+    x2 = int(x2 * x_ratio)
+    y2 = int(y2 * y_ratio)
     return BoundingBox(
-        x1=int(coor[1] * x_ratio),
-        y1=int(coor[0] * y_ratio),
-        x2=int(coor[3] * x_ratio),
-        y2=int(coor[2] * y_ratio),
+        x=x1,
+        y=y1,
+        w=x2 - x1,
+        h=y2 - y1,
     )
 
 def construct_yolov4_object_detector(

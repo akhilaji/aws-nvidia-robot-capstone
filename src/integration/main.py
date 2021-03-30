@@ -1,7 +1,6 @@
 from skeleton import calibration
 from skeleton import depth
 from skeleton import detect
-from skeleton import detect_old
 from skeleton import graph
 from skeleton import pick
 from skeleton import pipeline
@@ -25,18 +24,6 @@ def graph_factory() -> graph.Graph:
             )
         )
     )
-
-def construct_scene_graph(
-        cap: cv2.VideoCapture,
-        detection_pipeline: pipeline.DetectionPipeline,
-        scene_reconstructor: reconstruction.SceneReconstructor,
-    ):
-    frame = None
-    while cap.grab():
-        frame = cap.retrieve(frame)
-        detections = detection_pipeline(frame)
-        scene_reconstructor.add_frame(detections)
-    return scene_reconstructor.finalize()
 
 def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.DetectionPipeline:
     return pipeline.DetectionPipeline(
@@ -65,41 +52,57 @@ def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.Detection
         ),
     )
 
+def construct_scene_graph(
+        cap: cv2.VideoCapture,
+        detection_pipeline: pipeline.DetectionPipeline,
+        scene_reconstructor: reconstruction.SceneReconstructor,
+    ):
+    frame = None
+    while cap.grab():
+        frame = cap.retrieve(frame)
+        detections = detection_pipeline(frame)
+        scene_reconstructor.add_frame(detections)
+    return scene_reconstructor.finalize()
+
+def run_visualization(
+        cap: cv2.VideoCapture,
+        out: cv2.VideoWriter,
+        detection_pipeline: pipeline.DetectionPipeline,
+    ) -> None:
+    ret, frame = True, None
+    while cap.grab():
+        ret, frame = cap.retrieve(frame)
+        detections = detection_pipeline(frame)
+        visualization.draw_all_detections(
+            img=frame,
+            detections=detections,
+            color=[255,0,0],
+            font_face=cv2.FONT_HERSHEY_PLAIN,
+            font_scale=5.0,
+            thickness=3
+        )
+        out.write(frame)
+
 def main(args: argparse.Namespace) -> None:
     detection_pipeline = construct_detection_pipeline(args)
-
-    filename = args.first_image
-    bgr_img = cv2.imread(filename)
-    rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
-    resized = cv2.resize(bgr_img, (608,608))
-
-    detections = detection_pipeline(rgb_img)
-    
-    for det in detections:
-        visualization.draw_detection(
-            resized,
-            det,
-            [255,0,200],
-            cv2.FONT_HERSHEY_PLAIN,
-            1.0,
-        )
-
-    cv2.imshow(filename, resized)
-    cv2.waitKey(0)
+    file_name = args.file_name
+    out_file_name = file_name + 'out.mp4'
+    cap = cv2.VideoCapture(file_name)
+    out = cv2.VideoWriter(out_file_name, cv2.VideoWriter_fourcc(*'DIVX'), 60, (1920, 1080))
+    run_visualization(
+        cap=cap,
+        out=out,
+        detection_pipeline=detection_pipeline,
+    )
+    cap.release()
+    out.release()
     return None
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--model-path',   type=str, default='./yolov4-608/')
-    arg_parser.add_argument('--input-w',      type=int, default=608)
-    arg_parser.add_argument('--input-h',      type=int, default=608)
-    arg_parser.add_argument('--depth-device', type=str, default='cuda')
-    arg_parser.add_argument('--first-image',  type=str, default=None)
-    arg_parser.add_argument('--second-image', type=str, default=None)
-    args = arg_parser.parse_args()
-    
-    # argument error checks
-    if args.first_image is None:
-        raise ValueError('Expected a first image (Hint: Use --first-image)')
-    
+    arg_parser.add_argument('--model_path',   type=str, default='./yolov4-608/')
+    arg_parser.add_argument('--input_w',      type=int, default=608)
+    arg_parser.add_argument('--input_h',      type=int, default=608)
+    arg_parser.add_argument('--depth_device', type=str, default='cuda')
+    arg_parser.add_argument('--file_name',    type=str)
     main(arg_parser.parse_args())

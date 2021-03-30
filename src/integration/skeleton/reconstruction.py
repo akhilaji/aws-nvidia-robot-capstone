@@ -10,8 +10,6 @@
 from skeleton.detect import ID, ObjectDetection
 from skeleton.graph import Graph, all_simple_path_costs
 
-# import skeleton.graph
-
 import numpy as np
 import open3d
 
