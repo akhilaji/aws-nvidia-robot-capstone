@@ -71,7 +71,7 @@ def run_visualization(
         cap: cv2.VideoCapture,
         out: cv2.VideoWriter,
         detection_pipeline: pipeline.DetectionPipeline,
-    ) -> List[Dict[str, detect.ObjectDetection]]:
+    ) -> List[Dict[ID, detect.ObjectDetection]]:
     ret, frame = True, None
 
     results = []
@@ -80,7 +80,7 @@ def run_visualization(
         detections = detection_pipeline(frame)
 
         for detection in detections:
-            results.append({detection.id: detection})
+            results.append(detection)
 
         visualization.draw_all_detections(
             img=frame,
@@ -119,14 +119,11 @@ def main(args: argparse.Namespace) -> None:
     vid_one = construct_video_scene(args, args.input_videos[0])
     vid_two = construct_video_scene(args, args.input_videos[1])
 
-    vid_one_ids = vid_one.keys()
-    vid_two.ids = vid_two.keys()
-
-    for i in range(len(vid_one_ids)):
-        if vid_one_ids[i] != vid_two_ids[i]:
+    for i in range(len(vid_one)):
+        if vid_one[i].id != vid_two[i].id:
             print('DIFFERENCE DETECTED')
-            print('EXPECTED: {}, ACTUAL: {}'.format(vid_one_ids[i],
-                                                    vid_two_ids[i]))
+            print('EXPECTED: {}, ACTUAL: {}'.format(vid_one[i].id,
+                                                    vid_two[i].id))
 
     return None
 
