@@ -90,7 +90,8 @@ def run_visualization(
             font_scale=5.0,
             thickness=3
         )
-        print('objects = ' + str(objects))
+        
+        #print('objects = ' + str(objects))
         out.write(frame)
 
     return objects.values()
@@ -110,8 +111,8 @@ def construct_video_scene(
     cap_w = 3840
     cap_h = 2160
 
-    print(cap_framerate)
-    print((cap_w, cap_h))
+    #print(cap_framerate)
+    #print((cap_w, cap_h))
     out = cv2.VideoWriter(
         out_file_name,
         cv2.VideoWriter_fourcc(*'DIVX'),
@@ -133,13 +134,20 @@ def construct_video_scene(
 def main(args: argparse.Namespace) -> None:
     objects_vid_1 = construct_video_scene(args, args.input_videos[0])
     objects_vid_2 = construct_video_scene(args, args.input_videos[1])
-    print('objects_vid_1=%r' % objects_vid_1)
-    print('objects_vid_2=%r' % objects_vid_2)
-    # for i in range(len(vid_one)):
-    #     if vid_one[i].id != vid_two[i].id:
-    #         print('DIFFERENCE DETECTED')
-    #         print('EXPECTED: {}, ACTUAL: {}'.format(vid_one[i].id,
-    #                                                 vid_two[i].id))
+
+    for fr in range(len(objects_vid_1)):
+        if fr < len(objects_vid_2):
+            if objects_vid_1[fr] != objects_vid_2[fr]:
+                print('SCENE DIFFERENCE DETECTION FOUND')
+                print('Expected: {}'.format(objects_vid_1[fr]))
+                print('Found: {}'.format(objects_vid_2[fr]))
+        else:
+            if object_frames_one > object_frames_two:
+                print('EXTRA OBJECTS FOUND IN FIRST VIDEO STREAM')
+    
+    #print('objects_vid_1=%r' % objects_vid_1)
+    #print('objects_vid_2=%r' % objects_vid_2)
+
     return None
 
 if __name__ == '__main__':
