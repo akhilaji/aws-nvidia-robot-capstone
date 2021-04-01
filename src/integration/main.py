@@ -90,7 +90,7 @@ def run_visualization(
             font_scale=5.0,
             thickness=3
         )
-        
+
         #print('objects = ' + str(objects))
         out.write(frame)
 
@@ -132,8 +132,8 @@ def construct_video_scene(
     return results
 
 def main(args: argparse.Namespace) -> None:
-    objects_vid_1 = construct_video_scene(args, args.input_videos[0])
-    objects_vid_2 = construct_video_scene(args, args.input_videos[1])
+    objects_vid_1 = list(construct_video_scene(args, args.input_videos[0]))
+    objects_vid_2 = list(construct_video_scene(args, args.input_videos[1]))
 
     for fr in range(len(objects_vid_1)):
         if fr < len(objects_vid_2):
