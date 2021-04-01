@@ -15,6 +15,9 @@ import argparse
 from cv2 import cv2
 import torch
 
+from typing import Dict, List, TypeVar
+ID = TypeVar('ID')
+
 def graph_factory() -> graph.Graph:
     return graph.Graph(
         V=set(),
@@ -68,11 +71,17 @@ def run_visualization(
         cap: cv2.VideoCapture,
         out: cv2.VideoWriter,
         detection_pipeline: pipeline.DetectionPipeline,
-    ) -> None:
+    ) -> List[Dict[str, detect.ObjectDetection]]:
     ret, frame = True, None
+
+    results = []
     while cap.grab():
         ret, frame = cap.retrieve(frame)
         detections = detection_pipeline(frame)
+
+        for detection in detections:
+            results.append({detection.id: detection})
+
         visualization.draw_all_detections(
             img=frame,
             detections=detections,
@@ -81,21 +90,44 @@ def run_visualization(
             font_scale=5.0,
             thickness=3
         )
+
         out.write(frame)
 
-def main(args: argparse.Namespace) -> None:
+    return results
+
+def construct_video_scene(
+        args: argparse.Namespace,
+        file_name: str) -> List[Dict[ID, detect.ObjectDetection]]:
     detection_pipeline = construct_detection_pipeline(args)
-    file_name = args.file_name
-    out_file_name = file_name + 'out.mp4'
+    out_file_name = file_name + '-out.mp4'
+
     cap = cv2.VideoCapture(file_name)
     out = cv2.VideoWriter(out_file_name, cv2.VideoWriter_fourcc(*'DIVX'), 60, (1920, 1080))
-    run_visualization(
+
+    results = run_visualization(
         cap=cap,
         out=out,
         detection_pipeline=detection_pipeline,
     )
+
     cap.release()
     out.release()
+
+    return results
+
+def main(args: argparse.Namespace) -> None:
+    vid_one = construct_video_scene(args, args.input_videos[0])
+    vid_two = construct_video_scene(args, args.input_videos[1])
+
+    vid_one_ids = vid_one.keys()
+    vid_two.ids = vid_two.keys()
+
+    for i in range(len(vid_one_ids)):
+        if vid_one_ids[i] != vid_two_ids[i]:
+            print('DIFFERENCE DETECTED')
+            print('EXPECTED: {}, ACTUAL: {}'.format(vid_one_ids[i],
+                                                    vid_two_ids[i]))
+
     return None
 
 if __name__ == '__main__':
@@ -104,5 +136,6 @@ if __name__ == '__main__':
     arg_parser.add_argument('--input_w',      type=int, default=608)
     arg_parser.add_argument('--input_h',      type=int, default=608)
     arg_parser.add_argument('--depth_device', type=str, default='cuda')
-    arg_parser.add_argument('--file_name',    type=str)
+    arg_parser.add_argument('--input-videos', type=str, nargs=2)
+
     main(arg_parser.parse_args())
