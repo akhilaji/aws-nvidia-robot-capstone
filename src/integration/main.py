@@ -131,6 +131,7 @@ def construct_video_scene(
     return results
 
 def main(args: argparse.Namespace) -> None:
+<<<<<<< Updated upstream
     objects_vid_1 = construct_video_scene(args, args.input_videos[0])
     objects_vid_2 = construct_video_scene(args, args.input_videos[1])
     print('objects_vid_1=%r' % objects_vid_1)
@@ -140,11 +141,29 @@ def main(args: argparse.Namespace) -> None:
     #         print('DIFFERENCE DETECTED')
     #         print('EXPECTED: {}, ACTUAL: {}'.format(vid_one[i].id,
     #                                                 vid_two[i].id))
+=======
+    vid_one = construct_video_scene(args, args.input_videos[0])
+    vid_two = construct_video_scene(args, args.input_videos[1])
+
+    class_ids = {}
+    class_ref = args.class_names
+    f = open(class_ref, "r")
+    for count, line in enumerate(f):
+         class_ids[count] = line
+    print(class_ids)
+    for i in range(len(vid_one)):
+        if vid_one[i].id != vid_two[i].id:
+            print('DIFFERENCE DETECTED')
+            print('EXPECTED: {}, ACTUAL: {}'.format(class_ids[vid_one[i].id],
+                                                    class_ids[vid_two[i].id]))
+
+>>>>>>> Stashed changes
     return None
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--model_path',   type=str, default='./yolov4-608/')
+    arg_parser.add_argument('--class_names',   type=str, default='./data/classes/obj.names')
     arg_parser.add_argument('--input_w',      type=int, default=608)
     arg_parser.add_argument('--input_h',      type=int, default=608)
     arg_parser.add_argument('--depth_device', type=str, default='cuda')
