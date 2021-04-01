@@ -32,7 +32,8 @@ def draw_detection(
         thickness: int = 1,
         line_type: int = cv2.LINE_8,
     ) -> None:
-    text = 'id=%r, class=%s, prob=%r' % (det.id, (list(utils.read_class_names(cfg.YOLO.CLASSES).values()))[det.obj_class], det.prob)
+    cx, cy = np.array([det.bbox.x + det.bbox.w / 2.0, det.bbox.y + det.bbox.h / 2.0], np.float32)
+    text = 'id=%r, class=%s, prob=%r, centroid=%r' % (det.id, det.obj_class, det.prob, (cx, cy))
     draw_bbox(img, det.bbox, color, thickness, line_type)
     draw_text(img, text, (det.bbox.x, det.bbox.y), font_face, font_scale, color, thickness, line_type)
 

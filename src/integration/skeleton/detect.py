@@ -60,7 +60,7 @@ class ObjectDetection:
     def __init__(self,
             id: ID,
             bbox: BoundingBox,
-            obj_class: int,
+            obj_class: str,
             prob: float,
             pt: NDArray[3, float]
         ):
@@ -93,15 +93,14 @@ class ObjectDetector:
 
 class YOLOv4ObjectDetector(ObjectDetector):
     def __init__(self,
-                 model,
-                 session,
-                 input_dim: Tuple[int, int],
-                 max_output_size_per_class: int = 50,
-                 max_total_size: int = 50,
-                 iou_threshold: float = 0.45,
-                 score_threshold: float = 0.25,
+            model,
+            session,
+            input_dim: Tuple[int, int],
+            max_output_size_per_class: int = 50,
+            max_total_size: int = 50,
+            iou_threshold: float = 0.45,
+            score_threshold: float = 0.25,
         ):
-
         self.model = model
         self.session = session
         self.input_dim = input_dim
@@ -127,13 +126,13 @@ class YOLOv4ObjectDetector(ObjectDetector):
             iou_threshold=self.iou_threshold,
             score_threshold=self.score_threshold,
         )
-
+        class_names = (list(utils.read_class_names(cfg.YOLO.CLASSES).values()))
         frame_h, frame_w, no_channels = frame.shape
         return [
             ObjectDetection(
                 id=None,
                 bbox=convert_bbox(boxes[0][i], frame_w, frame_h),
-                obj_class=int(classes[0][i].numpy()),
+                obj_class=class_names[int(classes[0][i].numpy())],
                 prob=scores[0][i].numpy(),
                 pt=None,
             )

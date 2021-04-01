@@ -51,7 +51,7 @@ def construct_detection_pipeline(args: argparse.Namespace) -> pipeline.Detection
         object_tracker=track.CentroidTracker(
             id_itr=itertools.count(start=0, step=1),
             pruning_age=50,
-            dist_thresh=100.0,
+            dist_thresh=500.0,
         ),
     )
 
@@ -74,13 +74,13 @@ def run_visualization(
     ) -> List[Dict[ID, detect.ObjectDetection]]:
     ret, frame = True, None
 
-    results = []
+    objects = dict()
     while cap.grab():
         ret, frame = cap.retrieve(frame)
         detections = detection_pipeline(frame)
 
-        for detection in detections:
-            results.append(detection)
+        for det in detections:
+            objects[det.id] = det.obj_class
 
         visualization.draw_all_detections(
             img=frame,
@@ -90,10 +90,10 @@ def run_visualization(
             font_scale=5.0,
             thickness=3
         )
-
+        print('objects = ' + str(objects))
         out.write(frame)
 
-    return results
+    return objects.values()
 
 def construct_video_scene(
         args: argparse.Namespace,
@@ -102,7 +102,22 @@ def construct_video_scene(
     out_file_name = file_name + '-out.mp4'
 
     cap = cv2.VideoCapture(file_name)
-    out = cv2.VideoWriter(out_file_name, cv2.VideoWriter_fourcc(*'DIVX'), 60, (1920, 1080))
+    cap_framerate = cap.get(cv2.CAP_PROP_XI_FRAMERATE)
+    cap_w = cap.get(cv2.CAP_PROP_XI_WIDTH)
+    cap_h = cap.get(cv2.CAP_PROP_XI_HEIGHT)
+
+    cap_framerate = 60
+    cap_w = 3840
+    cap_h = 2160
+
+    print(cap_framerate)
+    print((cap_w, cap_h))
+    out = cv2.VideoWriter(
+        out_file_name,
+        cv2.VideoWriter_fourcc(*'DIVX'),
+        cap_framerate,
+        (cap_w, cap_h),
+    )
 
     results = run_visualization(
         cap=cap,
@@ -116,15 +131,15 @@ def construct_video_scene(
     return results
 
 def main(args: argparse.Namespace) -> None:
-    vid_one = construct_video_scene(args, args.input_videos[0])
-    vid_two = construct_video_scene(args, args.input_videos[1])
-
-    for i in range(len(vid_one)):
-        if vid_one[i].id != vid_two[i].id:
-            print('DIFFERENCE DETECTED')
-            print('EXPECTED: {}, ACTUAL: {}'.format(vid_one[i].id,
-                                                    vid_two[i].id))
-
+    objects_vid_1 = construct_video_scene(args, args.input_videos[0])
+    objects_vid_2 = construct_video_scene(args, args.input_videos[1])
+    print('objects_vid_1=%r' % objects_vid_1)
+    print('objects_vid_2=%r' % objects_vid_2)
+    # for i in range(len(vid_one)):
+    #     if vid_one[i].id != vid_two[i].id:
+    #         print('DIFFERENCE DETECTED')
+    #         print('EXPECTED: {}, ACTUAL: {}'.format(vid_one[i].id,
+    #                                                 vid_two[i].id))
     return None
 
 if __name__ == '__main__':
@@ -133,6 +148,6 @@ if __name__ == '__main__':
     arg_parser.add_argument('--input_w',      type=int, default=608)
     arg_parser.add_argument('--input_h',      type=int, default=608)
     arg_parser.add_argument('--depth_device', type=str, default='cuda')
-    arg_parser.add_argument('--input-videos', type=str, nargs=2)
+    arg_parser.add_argument('--input_videos', type=str, nargs=2)
 
     main(arg_parser.parse_args())
