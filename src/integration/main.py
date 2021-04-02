@@ -135,16 +135,29 @@ def main(args: argparse.Namespace) -> None:
     objects_vid_1 = list(construct_video_scene(args, args.input_videos[0]))
     objects_vid_2 = list(construct_video_scene(args, args.input_videos[1]))
 
-    for fr in range(len(objects_vid_1)):
-        if fr < len(objects_vid_2):
-            if objects_vid_1[fr] != objects_vid_2[fr]:
+    fr_one = 0;
+    fr_two = 0;
+
+    while fr_one < len(objects_vid_1):
+        if fr_one < len(objects_vid_2) and fr_two < len(objects_vid_2):
+            if objects_vid_1[fr_one] != objects_vid_2[fr_two]:
                 print('SCENE DIFFERENCE DETECTION FOUND')
-                print('Expected: {}'.format(objects_vid_1[fr]))
-                print('Found: {}'.format(objects_vid_2[fr]))
+                print('Expected: {}'.format(objects_vid_1[fr_one]))
+                print('Found: {}'.format(objects_vid_2[fr_two]))
+
+                # objects don't match at same index, move to the next expected image
+                fr_one += 1
+            else:
+                # objects match at same index, look at next two
+                fr_one += 1
+                fr_two += 1
         else:
             if object_frames_one > object_frames_two:
                 print('EXTRA OBJECTS FOUND IN FIRST VIDEO STREAM')
-    
+
+            fr_one += 1
+            fr_two += 1
+
     #print('objects_vid_1=%r' % objects_vid_1)
     #print('objects_vid_2=%r' % objects_vid_2)
 
