@@ -132,16 +132,20 @@ def construct_video_scene(
     return results
 
 def main(args: argparse.Namespace) -> None:
-    frames_vid_1 = list(construct_video_scene(args, args.input_videos[0].)) # {class_names}
+    frames_vid_1 = list(construct_video_scene(args, args.input_videos[0])) # {class_names}
     frames_vid_2 = list(construct_video_scene(args, args.input_videos[1]))  # {class_names}
 
     vid_1_freq = collections.Counter(frames_vid_1)
     vid_2_freq = collections.Counter(frames_vid_2)
-
-    diff = vid_1_freq - vid_2_freq
-
-    for obj_class, freq in diff.items():
-        if obj_class in frames_vid_1 and key not in frames_vid_2:
+    print("frequencies")
+    print(vid_1_freq)
+    print(vid_2_freq)
+    intersection = vid_1_freq & vid_2_freq
+    total = vid_1_freq + vid_2_freq
+    total = total - intersection - intersection
+    
+    for obj_class, freq in total.items():
+        if obj_class in frames_vid_1 and obj_class not in frames_vid_2:
             print('MISSING: {} {}'.format(freq, obj_class))
         elif obj_class in frames_vid_2 and obj_class not in frames_vid_1:
             print('EXTRA OBJECT: {} {}'.format(freq, obj_class))
