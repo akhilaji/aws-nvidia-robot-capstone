@@ -83,7 +83,7 @@ def run_visualization(
         for det in detections:
             tmp[det.id] = det.obj_class
 
-        objects.append(diff_data)
+        objects.append(tmp)
 
         visualization.draw_all_detections(
             img=frame,
