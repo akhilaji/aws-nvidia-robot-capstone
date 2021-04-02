@@ -74,13 +74,16 @@ def run_visualization(
     ) -> List[Dict[ID, detect.ObjectDetection]]:
     ret, frame = True, None
 
-    objects = dict()
+    objects = list()
     while cap.grab():
         ret, frame = cap.retrieve(frame)
         detections = detection_pipeline(frame)
 
+        tmp = dict()
         for det in detections:
-            objects[det.id] = det.obj_class
+            tmp[det.id] = det.obj_class
+
+        objects.append(diff_data)
 
         visualization.draw_all_detections(
             img=frame,
@@ -94,7 +97,7 @@ def run_visualization(
         #print('objects = ' + str(objects))
         out.write(frame)
 
-    return objects.values()
+    return objects
 
 def construct_video_scene(
         args: argparse.Namespace,
@@ -132,9 +135,40 @@ def construct_video_scene(
     return results
 
 def main(args: argparse.Namespace) -> None:
-    objects_vid_1 = list(construct_video_scene(args, args.input_videos[0]))
-    objects_vid_2 = list(construct_video_scene(args, args.input_videos[1]))
+    frames_vid_1 = construct_video_scene(args, args.input_videos[0])
+    frames_vid_2 = construct_video_scene(args, args.input_videos[1])
 
+    curr_fr = 0
+    fr_length_1 = len(frames_vid_1)
+    fr_length_2 = len(frames_vid_2)
+
+
+    threshold = 3
+    offenses = 0
+
+    while curr_fr < fr_length_1 and curr_fr < fr_length_2:
+        classes_1 = list(frames_vid_1[curr_fr].values()) # list of classes in frame from video 1
+        classes_2 = list(frames_vid_2[curr_fr].values()) # list of classes in frame from video 2
+
+        if collections.Counter(classes_1) != collections.Counter(classes_2):
+            offenses += 1
+        else:
+            offenses = 0
+
+        # check if a diff should be thrown
+        if offenses >= threshold:
+            offenses = 0
+            offending_objects = []
+            for i in range(len(classes_1)):
+                if classes_1[i] != classes_2[i]:
+                    offending_objects.append((classes_1[i], classes_2[i]))
+
+            print('SCENE DIFFERENCE(S) FOUND')
+            for off in offending_objects:
+                print('EXPECTED (FROM VID 1): {}'.format(offending_objects[0]))
+                print('ACTUAL   (FROM VID 2): {}'.format(offending_objects[1]))
+
+    '''
     fr_one = 0;
     fr_two = 0;
 
@@ -157,6 +191,7 @@ def main(args: argparse.Namespace) -> None:
 
             fr_one += 1
             fr_two += 1
+    '''
 
     #print('objects_vid_1=%r' % objects_vid_1)
     #print('objects_vid_2=%r' % objects_vid_2)
