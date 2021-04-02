@@ -164,7 +164,7 @@ def main(args: argparse.Namespace) -> None:
                     if classes_1[i] != classes_2[i]:
                         offending_objects.append((classes_1[i], classes_2[i]))
                 else:
-                    offending_objects.append(classes[i], 'MISSING')
+                    offending_objects.append(classes_1[i], 'MISSING')
 
             print('SCENE DIFFERENCE(S) FOUND')
             for off in offending_objects:
