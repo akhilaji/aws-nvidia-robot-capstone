@@ -111,8 +111,8 @@ def construct_video_scene(
     cap_h = cap.get(cv2.CAP_PROP_XI_HEIGHT)
 
     cap_framerate = 60
-    cap_w = 3840
-    cap_h = 2160
+    cap_w = 1920
+    cap_h = 1080
 
     #print(cap_framerate)
     #print((cap_w, cap_h))
@@ -164,12 +164,12 @@ def main(args: argparse.Namespace) -> None:
                     if classes_1[i] != classes_2[i]:
                         offending_objects.append((classes_1[i], classes_2[i]))
                 else:
-                    offending_objects.append(classes_1[i], 'MISSING')
+                    offending_objects.append((classes_1[i], 'MISSING'))
 
             print('SCENE DIFFERENCE(S) FOUND')
             for off in offending_objects:
-                print('EXPECTED (FROM VID 1): {}'.format(offending_objects[0]))
-                print('ACTUAL   (FROM VID 2): {}'.format(offending_objects[1]))
+                print('EXPECTED (FROM VID 1): {}'.format(off[0]))
+                print('ACTUAL   (FROM VID 2): {}'.format(off[1]))
 
         curr_fr += 1
 
