@@ -74,16 +74,13 @@ def run_visualization(
     ) -> List[Dict[ID, detect.ObjectDetection]]:
     ret, frame = True, None
 
-    objects = list()
+    objects = dict()
     while cap.grab():
         ret, frame = cap.retrieve(frame)
         detections = detection_pipeline(frame)
 
-        tmp = dict()
         for det in detections:
-            tmp[det.id] = det.obj_class
-
-        objects.append(tmp)
+            objects[det.id] = det.obj_class
 
         visualization.draw_all_detections(
             img=frame,
@@ -97,7 +94,7 @@ def run_visualization(
         #print('objects = ' + str(objects))
         out.write(frame)
 
-    return objects
+    return objects.values()
 
 def construct_video_scene(
         args: argparse.Namespace,
@@ -135,71 +132,24 @@ def construct_video_scene(
     return results
 
 def main(args: argparse.Namespace) -> None:
-    frames_vid_1 = construct_video_scene(args, args.input_videos[0])
-    frames_vid_2 = construct_video_scene(args, args.input_videos[1])
+    frames_vid_1 = list(construct_video_scene(args, args.input_videos[0].)) # {class_names}
+    frames_vid_2 = list(construct_video_scene(args, args.input_videos[1]))  # {class_names}
 
-    curr_fr = 0
-    fr_length_1 = len(frames_vid_1)
-    fr_length_2 = len(frames_vid_2)
+    vid_1_freq = collections.Counter(frames_vid_1)
+    vid_2_freq = collections.Counter(frames_vid_2)
 
+    diff = vid_1_freq - vid_2_freq
 
-    threshold = 3
-    offenses = 0
-
-    while curr_fr < fr_length_1 and curr_fr < fr_length_2:
-        classes_1 = list(frames_vid_1[curr_fr].values()) # list of classes in frame from video 1
-        classes_2 = list(frames_vid_2[curr_fr].values()) # list of classes in frame from video 2
-
-        if collections.Counter(classes_1) != collections.Counter(classes_2):
-            offenses += 1
+    for obj_class, freq in diff.items():
+        if obj_class in frames_vid_1 and key not in frames_vid_2:
+            print('MISSING: {} {}'.format(freq, obj_class))
+        elif obj_class in frames_vid_2 and obj_class not in frames_vid_1:
+            print('EXTRA OBJECT: {} {}'.format(freq, obj_class))
         else:
-            offenses = 0
-
-        # check if a diff should be thrown
-        if offenses >= threshold:
-            offenses = 0
-            offending_objects = []
-            for i in range(len(classes_1)):
-                if i < len(classes_2):
-                    if classes_1[i] != classes_2[i]:
-                        offending_objects.append((classes_1[i], classes_2[i]))
-                else:
-                    offending_objects.append((classes_1[i], 'MISSING'))
-
-            print('SCENE DIFFERENCE(S) FOUND')
-            for off in offending_objects:
-                print('EXPECTED (FROM VID 1): {}'.format(off[0]))
-                print('ACTUAL   (FROM VID 2): {}'.format(off[1]))
-
-        curr_fr += 1
-
-    '''
-    fr_one = 0;
-    fr_two = 0;
-
-    while fr_one < len(objects_vid_1):
-        if fr_one < len(objects_vid_2) and fr_two < len(objects_vid_2):
-            if objects_vid_1[fr_one] != objects_vid_2[fr_two]:
-                print('SCENE DIFFERENCE DETECTION FOUND')
-                print('Expected: {}'.format(objects_vid_1[fr_one]))
-                print('Found: {}'.format(objects_vid_2[fr_two]))
-
-                # objects don't match at same index, move to the next expected image
-                fr_one += 1
+            if vid_1_freq[obj_class] > vid_2_freq[obj_class]:
+                print('MISSING: {} {}'.format(freq, obj_class))
             else:
-                # objects match at same index, look at next two
-                fr_one += 1
-                fr_two += 1
-        else:
-            if object_frames_one > object_frames_two:
-                print('EXTRA OBJECTS FOUND IN FIRST VIDEO STREAM')
-
-            fr_one += 1
-            fr_two += 1
-    '''
-
-    #print('objects_vid_1=%r' % objects_vid_1)
-    #print('objects_vid_2=%r' % objects_vid_2)
+                print('EXTRA OBJECT: {} {}'.format(freq, obj_class))
 
     return None
 
