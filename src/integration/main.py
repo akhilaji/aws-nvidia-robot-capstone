@@ -168,6 +168,8 @@ def main(args: argparse.Namespace) -> None:
                 print('EXPECTED (FROM VID 1): {}'.format(offending_objects[0]))
                 print('ACTUAL   (FROM VID 2): {}'.format(offending_objects[1]))
 
+        curr_fr += 1
+
     '''
     fr_one = 0;
     fr_two = 0;
