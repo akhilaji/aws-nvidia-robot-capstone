@@ -21,7 +21,6 @@ paste these folders into /src/integration
 
 https://www.tensorflow.org/install/gpu
 
-
 The Custom YoloV4 Model can detect objects from the following classes:  
 Bottle   
 Chair  
@@ -45,4 +44,12 @@ Television
 Whiteboard  
 Filing cabinet  
 Picture frame  
+
+## Functionality
+
+
+
+​    
+
+
 
