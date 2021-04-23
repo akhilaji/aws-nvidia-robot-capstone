@@ -3,6 +3,7 @@
 _Fall 2020 - Spring 2021_
 
 Akhil Aji, Jacob Anderson, Jacob Cohen, Preston Mott, Jacob Schmit, Riley Tuoti
+
 **Sponsors**: Dr. Yinong Chen, Dr. Gennaro De Luca
 
 The AWS-Nvidia Robot for Image Difference Detection is an autonomous robotic system capable of navigating an office space and reporting changes in a scene.
