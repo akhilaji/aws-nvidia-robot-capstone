@@ -1,8 +1,0 @@
-{
-  "ExpandedNodes": [
-    ""
-  ],
-  "SelectedNode": "\\automated_VOC_convert.py",
-  "PreviewInSolutionExplorer": false,
-  "python.linting.pylintArgs": ["--generate-members"]
-}
